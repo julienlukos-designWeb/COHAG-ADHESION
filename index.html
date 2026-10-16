@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; connect-src https://zymyvfctoldjybbnmkjs.supabase.co wss://zymyvfctoldjybbnmkjs.supabase.co; img-src 'self' data: https://zymyvfctoldjybbnmkjs.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer"><meta name="theme-color" content="#2746c7"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
+<meta name="robots" content="noindex,nofollow">
+<title>COHAG — Gestion des adhésions</title>
+<style>
+:root{--blue:#2746c7;--blue2:#5b72f0;--deep:#1c3190;--navy:#101d46;--teal:#17a7a0;--bg:#eef2fb;--ink:#182642;--muted:#66748f;--line:#e0e7f5;--danger:#b42318;--ok:#087f5b;--r:16px;--font:"Segoe UI",system-ui,-apple-system,Roboto,Arial,sans-serif}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.5 var(--font);color:var(--ink);background:radial-gradient(ellipse at 12% 10%,#dbe5ff,transparent 32%),radial-gradient(ellipse at 92% 86%,#d9f5f0,transparent 27%),linear-gradient(135deg,#f7f9ff,#eaf0fa);background-attachment:fixed}
+.hidden{display:none!important}
+:focus-visible{outline:3px solid #f6b73c;outline-offset:2px}
+.layout{display:flex;min-height:100vh}
+.side{width:230px;flex:none;padding:25px 16px;display:flex;flex-direction:column;color:#fff;background:linear-gradient(155deg,#111b3e,#243d94 55%,#1b6c91);box-shadow:8px 0 30px #152c6720}
+.brand{font-size:24px;font-weight:800;letter-spacing:2px;padding:8px 10px 30px}
+.brand small{display:block;font-size:10px;letter-spacing:.3px;color:#c8d5ff;margin-top:6px;font-weight:400}
+.nav{display:block;width:100%;text-align:left;border:1px solid transparent;background:transparent;color:#d9e2ff;padding:13px;margin:4px 0;border-radius:12px;cursor:pointer;font:700 14px var(--font);transition:transform .15s,background .15s,box-shadow .15s}
+.nav:hover{background:#ffffff1f;color:#fff}
+.nav.active{color:#fff;background:linear-gradient(180deg,#7791ff,#4d5be0);border-color:#ffffff40;box-shadow:0 4px 0 #2a2f97,0 10px 16px #07174455,inset 0 1px #ffffff60;transform:translateY(-1px)}
+.nav:active{transform:translateY(2px);box-shadow:0 1px 0 #2a2f97}
+.sidefoot{margin-top:auto;padding:18px 10px;font-size:11px;color:#c6d3ff}
+.main{flex:1;min-width:0;padding:0 30px 20px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:26px 0;margin-bottom:24px;border-bottom:1px solid #dce5f5}
+.top h1{margin:4px 0 0;font-size:26px;letter-spacing:-.7px;color:#1f3380}
+.eyebrow{font-size:11px;letter-spacing:1.2px;color:#6b7aa6;font-weight:700}
+.user{display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted)}
+/* Boutons 3D */
+.btn{border:0;border-radius:12px;padding:12px 16px;font:700 13px var(--font);cursor:pointer;position:relative;transition:transform .12s,box-shadow .12s,filter .15s}
+.btn:hover{transform:translateY(-2px);filter:brightness(1.05)}
+.btn:active{transform:translateY(3px)}
+.btn:disabled{opacity:.55;cursor:not-allowed;transform:none;filter:none}
+.primary{color:#fff;background:linear-gradient(180deg,#6f86ff,#2f4bcf);box-shadow:0 5px 0 #1d2f94,0 12px 20px #2a45b83d,inset 0 1px #ffffff80}
+.primary:active{box-shadow:0 2px 0 #1d2f94,0 4px 8px #2a45b83d,inset 0 1px #ffffff60}
+.light{color:#3d4c70;background:linear-gradient(180deg,#fff,#e9eefb);box-shadow:0 4px 0 #ced8ee,0 8px 14px #20366014,inset 0 1px #fff}
+.light:active{box-shadow:0 1px 0 #ced8ee}
+.danger{color:#fff;background:linear-gradient(180deg,#f0716a,#c4372d);box-shadow:0 4px 0 #8f2119,0 8px 14px #b423182e,inset 0 1px #ffffff70}
+.danger:active{box-shadow:0 1px 0 #8f2119}
+/* Cartes */
+.hero{position:relative;overflow:hidden;isolation:isolate;color:#fff;border-radius:22px;padding:28px;margin-bottom:20px;background:linear-gradient(115deg,#293cb5,#4f62e6 48%,var(--teal));box-shadow:0 18px 36px #334fc43b,inset 0 1px #ffffff70}
+.hero:after{content:"COHAG";position:absolute;z-index:-1;right:20px;bottom:-34px;font-size:104px;font-weight:900;letter-spacing:4px;color:#ffffff14}
+.hero h2{margin:0 0 8px;font-size:24px}.hero p{margin:0;color:#e6ebff}
+.pill{display:inline-block;font-size:10px;letter-spacing:1px;padding:6px 11px;margin-bottom:12px;background:#ffffff26;border-radius:30px;box-shadow:inset 0 1px #ffffff65}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
+.stat,.panel{position:relative;overflow:hidden;background:#fff;border:1px solid #ffffffd9;border-radius:var(--r);padding:20px;box-shadow:0 7px 0 #1b2c4a06,0 16px 30px #20366014,inset 0 1px #fff}
+.panel{margin-bottom:20px}
+.stat:before{content:"";position:absolute;right:-28px;top:-35px;width:105px;height:105px;border-radius:50%;background:var(--b);opacity:.75}
+.stat:nth-child(1){--b:#b8c9ff;background:linear-gradient(145deg,#fff,#eaf0ff)}
+.stat:nth-child(2){--b:#d9c5ff;background:linear-gradient(145deg,#fff,#f1eaff)}
+.stat:nth-child(3){--b:#b4f0dc;background:linear-gradient(145deg,#fff,#e2fbf3)}
+.stat:nth-child(4){--b:#ffdaa6;background:linear-gradient(145deg,#fff,#fff0dc)}
+.stat>*{position:relative}
+.stat span{color:var(--muted);font-size:12px}
+.stat strong{display:block;font-size:26px;margin:12px 0 4px;color:#243b88;letter-spacing:-1px}
+.stat small{color:#8793aa;font-size:11px}
+.panelhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
+.panel h3{margin:0;font-size:16px;color:#24396f}
+.muted{color:var(--muted);font-size:12px;margin-top:4px}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap}
+/* Formulaires */
+.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+label{display:block;font-size:12px;font-weight:700;margin:0 0 6px;color:#56627a}
+input,select{width:100%;border:1px solid #d5ddec;border-radius:11px;padding:12px;font:14px var(--font);color:#243047;background:linear-gradient(180deg,#fff,#fbfcff);box-shadow:inset 0 2px 3px #1c2e5910}
+input:focus,select:focus{border-color:#788bf0;outline:0;box-shadow:0 0 0 4px #dbe3ff}
+input:user-invalid,select:user-invalid{border-color:var(--danger)}
+.section{grid-column:1/-1;border-top:1px solid var(--line);padding-top:14px;color:#3851b5;font-weight:700}
+.actions{grid-column:1/-1;display:flex;justify-content:flex-end;gap:12px}
+.searchrow{display:flex;gap:10px;margin-bottom:15px}.searchrow input{flex:1}.searchrow select{width:220px}
+table{border-collapse:collapse;width:100%;font-size:13px;white-space:nowrap}
+th{text-align:left;background:linear-gradient(180deg,#eef3ff,#f8faff);color:#52628b;font-size:11px}
+th,td{padding:12px;border-bottom:1px solid #edf0f6}td{color:#44516a}
+tbody tr:hover td{background:#f3f7ff}
+.tablewrap{overflow:auto}.empty{text-align:center;color:#8995aa;padding:26px}
+/* Connexion */
+.loginwrap{min-height:65vh;display:grid;grid-template-columns:1.1fr .9fr;gap:25px;align-items:center;max-width:1000px;margin:0 auto}
+.promo{position:relative;overflow:hidden;color:#fff;border-radius:24px;padding:42px;min-height:350px;display:flex;flex-direction:column;justify-content:center;background:radial-gradient(circle at 85% 15%,#59d4d2,transparent 24%),linear-gradient(145deg,#111d46,#3149b9 58%,#158b9a);box-shadow:0 22px 45px #1d337c2c,inset 0 1px #ffffff70}
+.promo h2{font-size:38px;line-height:1.1;margin:12px 0}.promo p{line-height:1.7;color:#dbe4ff}
+.login{background:#fff;border:1px solid #fff;border-radius:22px;padding:30px;box-shadow:0 18px 42px #1b2e6518}
+.login h2{margin:0 0 6px;color:#263b81}.login label{margin-top:18px}
+.login .btn{width:100%;margin-top:22px;padding:14px}
+.message{font-size:12px;margin-top:12px;color:#b45309;min-height:1em}
+.message.error{color:var(--danger)}.message.success{color:var(--ok)}
+.note{font-size:11px;color:#8b96a9;margin-top:16px}
+footer{text-align:right;color:#637394;font-size:11px;font-weight:600;padding:20px 0 5px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}.main{padding:0 18px}.loginwrap{grid-template-columns:1fr}.promo{min-height:240px}.promo h2{font-size:30px}}
+@media(max-width:600px){.layout{flex-direction:column}.side{width:100%;flex-direction:row;align-items:center;padding:10px;gap:4px;overflow-x:auto}.brand{padding:0 10px 0 4px;font-size:18px}.brand small,.sidefoot{display:none}.nav{width:auto;white-space:nowrap;margin:0;padding:10px 12px;font-size:13px}.main{padding:0 12px}.top{flex-direction:column;align-items:flex-start}.top h1{font-size:21px}.stats{gap:8px}.stat{padding:14px}.stat strong{font-size:21px}.panelhead{flex-direction:column;align-items:flex-start}.formgrid{grid-template-columns:1fr}.searchrow{flex-direction:column}.searchrow select{width:100%}.hero:after{font-size:60px}footer{text-align:center}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{.side,.top,.hero,.toolbar,.searchrow,footer,.actions{display:none!important}body{background:#fff}.main{padding:0}.panel,.stat{box-shadow:none}}
+</style>
+<style id="v3">
+body{background:linear-gradient(180deg,#eef3fc,#e4ecf8)}
+.side{width:250px;position:relative;overflow:hidden;background:linear-gradient(180deg,#0b1f55,#12307f 62%,#0a2a6b)}
+.side:after{content:"";position:absolute;left:-70px;right:-70px;bottom:-90px;height:250px;background:linear-gradient(160deg,#2a64e6,#0b3a9c);transform:skew(-14deg,-8deg);opacity:.5}
+.side>*{position:relative;z-index:1}
+.brand{font-size:34px;letter-spacing:3px;text-align:center;padding:6px 0 26px;text-shadow:0 0 18px #7fb2ff,0 4px 0 #0006}
+.brand small{font-size:13px;letter-spacing:0;color:#dbe6ff;margin-top:10px}
+.nav{display:flex;align-items:center;gap:12px;padding:14px;margin:14px 0;border-radius:14px;color:#fff;border:1px solid #ffffff60;background:linear-gradient(180deg,var(--c1),var(--c2));box-shadow:0 5px 0 var(--sh),0 10px 18px #0006,inset 0 1px #ffffffa0}
+.nav[data-view=dashboard]{--c1:#43a6ff;--c2:#1565e0;--sh:#0d3f9e}
+.nav[data-view=adherents]{--c1:#3ddc5c;--c2:#0f9d2e;--sh:#0a6a1f}
+.nav[data-view=nouveau]{--c1:#ffa63a;--c2:#f06a05;--sh:#a84a00}
+.nav:after{content:"›";margin-left:auto;font-size:20px}
+.nav:hover{background:linear-gradient(180deg,var(--c1),var(--c2));filter:brightness(1.08);transform:translateY(-2px)}
+.nav.active{transform:none;border-color:#fff;box-shadow:0 5px 0 var(--sh),0 0 0 3px #ffffff45,0 0 22px var(--c1),inset 0 1px #fff}
+.nav:active{transform:translateY(4px);box-shadow:0 1px 0 var(--sh)}
+.ico{width:22px;text-align:center;font-size:18px}
+.top h1{color:#14285f;font-size:28px}
+.user{gap:14px}.who{display:flex;align-items:center;gap:10px;line-height:1.3}
+.av{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;font-weight:800;color:#fff;background:linear-gradient(135deg,#3c5be0,#17a7a0);box-shadow:0 0 0 3px #fff,0 4px 10px #1b306033}
+.who b{display:block;color:#14285f;font-size:13px}.who small{color:var(--muted)}
+.dark{color:#fff;background:linear-gradient(180deg,#1f45a0,#0b1d52);box-shadow:0 5px 0 #050f2e,0 10px 18px #0b1d5240,inset 0 1px #ffffff50}
+.dark:active{box-shadow:0 1px 0 #050f2e}
+.hero{display:flex;align-items:center;gap:20px;padding:30px 0 30px 34px;border-radius:26px;border:2px solid #ffffffa0;background:linear-gradient(100deg,#0f2a8f,#2457e6 55%,#1fb7c9);box-shadow:0 20px 40px #1d44b640,inset 0 1px #ffffff90}
+.hero:after{display:none}.hero>div:first-child{flex:1;min-width:0}
+.hero h2{font-size:34px;margin:0 0 10px}.hero em{font-style:normal;color:#6ff0ff}
+.hero svg{flex:none;width:300px;height:140px}
+.quote{flex:none;align-self:stretch;display:flex;align-items:center;max-width:220px;padding:0 30px;margin:-30px 0;font-size:18px;font-weight:700;text-align:center;background:linear-gradient(120deg,#17bcc8,#0b8f9f);border-radius:90px 0 0 90px}
+.stat{display:grid;grid-template-columns:48px 1fr;column-gap:12px;align-content:center;min-height:128px;color:#fff;border:2px solid #ffffffb0;border-radius:20px;background:linear-gradient(145deg,var(--c1),var(--c2));box-shadow:0 8px 0 var(--sh),0 18px 28px #1b30603a,inset 0 1px #fff9}
+.stat:before{display:none}
+.stat:nth-child(1){--c1:#4aa8ff;--c2:#1559e6;--sh:#0e3ca5}
+.stat:nth-child(2){--c1:#ffc15a;--c2:#f57c10;--sh:#b05600}
+.stat:nth-child(3){--c1:#3fe0a0;--c2:#0fa24f;--sh:#0a6c34}
+.stat:nth-child(4){--c1:#c58bff;--c2:#7a35e0;--sh:#4f1fa0}
+.stat span{color:#fff;font-weight:700;font-size:13px}.stat strong{color:#fff;font-size:26px;margin:6px 0 2px;text-shadow:0 2px 0 #0003}.stat small{color:#ffffffd0}
+.tile{grid-row:1/4;width:48px;height:48px;border-radius:13px;display:grid;place-items:center;font-size:22px;background:#ffffff38;box-shadow:inset 0 1px #fff9}
+.stat>.go{position:absolute;right:14px;bottom:14px;width:32px;height:32px;border:0;border-radius:50%;background:#fff;color:#1b3a9c;font-weight:900;cursor:pointer;box-shadow:0 3px 0 #0003}
+.stat>.go:active{transform:translateY(2px);box-shadow:none}
+.panel{border-radius:20px}
+.dgrid{display:grid;grid-template-columns:1fr 300px;gap:20px}.dgrid .panel{margin:0}.col2{display:grid;gap:20px;align-content:start}
+.avs{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;margin-right:10px;vertical-align:middle;font-size:11px;font-weight:800;color:#fff;background:linear-gradient(135deg,#3c5be0,#17a7a0)}
+.lst{margin:0;padding:0;list-style:none;font-size:12px}
+.lst.rep li{margin-bottom:14px}.rep div{display:flex;justify-content:space-between}
+.bar{height:7px;margin-top:6px;border-radius:7px;background:#e6ecf8;overflow:hidden}.bar i{display:block;height:100%;border-radius:7px;background:var(--c)}
+.act li{display:flex;gap:10px;margin-bottom:13px}.act li:before{content:"";flex:none;width:9px;height:9px;margin-top:5px;border-radius:50%;background:var(--c)}.act small{display:block;color:var(--muted)}
+@media(max-width:1100px){.dgrid{grid-template-columns:1fr}.quote{display:none}.hero{padding-right:20px}}
+@media(max-width:900px){.hero svg{display:none}}
+@media(max-width:600px){.side{width:100%}.side:after{display:none}.brand{font-size:20px;text-align:left;padding:0 10px 0 4px}.nav{margin:0;padding:10px 12px}.nav:after,.ico{display:none}.hero h2{font-size:24px}.stat{grid-template-columns:44px 1fr}}
+.nav[data-view=archives]{--c1:#b98cff;--c2:#7a35e0;--sh:#4f1fa0}
+.mini{padding:7px 11px;font-size:11px;border-radius:9px;margin-right:6px}
+.mini.light{box-shadow:0 3px 0 #ced8ee,inset 0 1px #fff}.mini.danger{box-shadow:0 3px 0 #8f2119,inset 0 1px #ffffff70}.mini.primary{box-shadow:0 3px 0 #1d2f94,inset 0 1px #ffffff80}
+.mini:active{transform:translateY(2px);box-shadow:none}
+.editbanner{grid-column:1/-1;background:#fff7e6;border:1px solid #ffd58a;color:#7a4a00;border-radius:11px;padding:10px 14px;font-size:12px}
+@media print{.acts{display:none!important}}
+/* Correctif lisibilité des cartes */
+.stat:nth-child(1){--c1:#3b82f6;--c2:#1447c8;--sh:#0c3190;background:linear-gradient(145deg,var(--c1),var(--c2))}
+.stat:nth-child(2){--c1:#f0922b;--c2:#c2500a;--sh:#8f3a05;background:linear-gradient(145deg,var(--c1),var(--c2))}
+.stat:nth-child(3){--c1:#22b573;--c2:#0b7a45;--sh:#07562f;background:linear-gradient(145deg,var(--c1),var(--c2))}
+.stat:nth-child(4){--c1:#a66bf0;--c2:#6a2bd0;--sh:#451a96;background:linear-gradient(145deg,var(--c1),var(--c2))}
+.stat span,.stat small,.stat strong{color:#fff;text-shadow:0 1px 3px #00000059}
+.stat small{font-size:12px}.stat strong{font-size:27px}
+.stat>.go{color:#1b3a9c;text-shadow:none}
+.nav[data-view=projets]{--c1:#2ec4c9;--c2:#0b8a96;--sh:#075f69}
+textarea{width:100%;min-height:80px;border:1px solid #d5ddec;border-radius:11px;padding:12px;font:14px var(--font);resize:vertical}
+.pcards{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.pcard{display:flex;flex-direction:column;gap:6px;text-align:left;cursor:pointer;border:1px solid var(--line);border-radius:16px;padding:16px;background:linear-gradient(180deg,#fff,#f4f7ff);font:13px var(--font);color:var(--ink);box-shadow:0 5px 0 #d7e0f3,0 10px 18px #20366014,inset 0 1px #fff;transition:transform .12s,box-shadow .12s}
+.pcard:hover{transform:translateY(-2px)}.pcard:active{transform:translateY(3px);box-shadow:0 1px 0 #d7e0f3}
+.pcard b{font-size:15px;color:#1f3380}.pcard small{color:var(--muted)}
+.badge{align-self:flex-start;font-size:10px;font-weight:800;padding:3px 9px;border-radius:20px;background:#dff5e8;color:#087f5b}.badge.termine{background:#e3e8f5;color:#3d4c70}.badge.suspendu{background:#ffe8d6;color:#b45309}
+.pdgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:12px}
+.kv{background:#f4f7ff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}.kv small{display:block;color:var(--muted);font-size:11px}.kv b{font-size:15px;color:#1f3380;word-break:break-word}.kv.wide{grid-column:1/-1}
+.kv[data-opt]{cursor:pointer;box-shadow:0 3px 0 #d7e0f3}.kv[data-opt]:hover{background:#e8efff}
+.avs{width:34px;height:34px}img.avs{object-fit:cover}
+.photoprev{width:96px;height:96px;object-fit:cover;border-radius:14px;border:3px solid #fff;box-shadow:0 6px 14px #1b306033}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="side"><div class="brand">COHAG<small>Plateforme de gestion des adhésions</small></div>
+<button class="nav hidden" data-view="dashboard"><span class="ico">🏠</span>Tableau de bord</button>
+<button class="nav hidden" data-view="adherents"><span class="ico">👥</span>Adhérents</button>
+<button class="nav hidden" data-view="nouveau"><span class="ico">➕</span>Nouvelle adhésion</button>
+<button class="nav hidden" data-view="archives"><span class="ico">🗄️</span>Archives</button>
+<button class="nav hidden" data-view="projets"><span class="ico">🏗️</span>Projets</button>
+<button class="nav hidden" data-view="utilisateurs"><span class="ico">🔑</span>Agents de saisie</button>
+<div class="sidefoot" id="status">● Hors connexion</div></aside>
+<main class="main">
+<header class="top"><div><div class="eyebrow">COOPÉRATIVE D’HABITAT</div><h1 id="pageTitle">Connexion</h1></div>
+<div class="user"><div class="who"><span class="av" id="avatar">🔒</span><div><b id="userName">Accès sécurisé</b><small id="userRole"></small></div></div><button id="logout" class="btn dark hidden" type="button">Déconnexion</button></div></header>
+
+<section id="loginView" class="loginwrap">
+<div class="promo"><span class="pill">PLATEFORME DE GESTION</span><h2>Construisons l’habitat de demain.</h2><p>Un espace centralisé pour gérer les adhésions, suivre les dossiers et protéger les données de la COHAG.</p></div>
+<form id="loginForm" class="login" autocomplete="on" novalidate>
+<h2>Connexion</h2><p class="muted">Accès réservé aux comptes autorisés.</p>
+<label for="email">Adresse e-mail</label><input id="email" type="email" required autocomplete="username" maxlength="120" placeholder="nom@exemple.com">
+<label for="password">Mot de passe</label><input id="password" type="password" required autocomplete="current-password" maxlength="128" placeholder="Votre mot de passe">
+<button id="loginBtn" class="btn primary" type="submit">Se connecter</button>
+<div id="loginMessage" class="message" role="alert"></div>
+<p class="note">Ne partagez jamais votre mot de passe. Vous serez déconnecté après 15 minutes d’inactivité.</p>
+</form></section>
+
+<section id="appView" class="hidden">
+<section id="dashboardView" class="view">
+<div class="hero"><div><span class="pill">VUE D’ENSEMBLE</span><h2>Bienvenue sur <em>COHAG</em></h2><p>Suivez les dossiers d’adhésion et les apports enregistrés de la coopérative d’habitat.</p></div>
+<svg viewBox="0 0 300 140" aria-hidden="true"><rect x="190" y="14" width="80" height="112" rx="4" fill="#cfe0ff"/><g fill="#7ea6ee"><rect x="200" y="28" width="14" height="14"/><rect x="222" y="28" width="14" height="14"/><rect x="244" y="28" width="14" height="14"/><rect x="200" y="54" width="14" height="14"/><rect x="222" y="54" width="14" height="14"/><rect x="244" y="54" width="14" height="14"/><rect x="200" y="80" width="14" height="14"/><rect x="244" y="80" width="14" height="14"/></g><ellipse cx="150" cy="128" rx="140" ry="10" fill="#3fae5a"/><rect x="60" y="62" width="110" height="64" fill="#f6e7bd"/><polygon points="48,66 115,14 182,66" fill="#c9482c"/><rect x="104" y="88" width="24" height="38" rx="3" fill="#7a4a24"/><rect x="72" y="76" width="22" height="20" fill="#9fd0ff"/><rect x="140" y="76" width="22" height="20" fill="#9fd0ff"/><circle cx="215" cy="104" r="12" fill="none" stroke="#f5b82e" stroke-width="6"/><rect x="224" y="101" width="34" height="6" rx="2" fill="#f5b82e"/><rect x="246" y="107" width="6" height="10" fill="#f5b82e"/></svg>
+<div class="quote">“Unis pour un habitat meilleur”</div></div>
+<div class="stats"><div class="stat"><span class="tile">👥</span><span>Total adhérents</span><strong id="total">0</strong><small>Dossiers enregistrés</small><button class="go" type="button" data-goto="adherents" aria-label="Voir la liste">→</button></div><div class="stat"><span class="tile">🪙</span><span>Frais d’adhésion</span><strong id="fees">0 FCFA</strong><small>Total des frais saisis</small><button class="go" type="button" data-goto="adherents" aria-label="Voir la liste">→</button></div><div class="stat"><span class="tile">📊</span><span>Apports déclarés</span><strong id="apports">0 FCFA</strong><small>Total des apports</small><button class="go" type="button" data-goto="adherents" aria-label="Voir la liste">→</button></div><div class="stat"><span class="tile">📅</span><span>Ce mois-ci</span><strong id="recent">0</strong><small>Adhésions du mois</small><button class="go" type="button" data-goto="adherents" aria-label="Voir la liste">→</button></div></div>
+<div class="panel"><div class="panelhead"><div><h3>Projets</h3><div class="muted">Cliquez sur un projet pour voir ses détails et la liste de ses membres.</div></div></div><div id="projCards" class="pcards"></div></div>
+<div class="dgrid"><div class="panel"><div class="panelhead"><div><h3>Dernières adhésions</h3><div class="muted">Les 5 derniers dossiers enregistrés</div></div><button class="btn primary" type="button" data-goto="adherents">Voir la liste →</button></div>
+<div class="tablewrap"><table><thead><tr><th>#</th><th>Adhérent</th><th>Matricule</th><th>Option</th><th>Frais</th><th>Date</th></tr></thead><tbody id="recentRows"></tbody></table></div></div>
+<div class="col2"><div class="panel"><h3>Répartition des adhérents</h3><ul class="lst rep" id="repart" style="margin-top:16px"></ul></div><div class="panel"><h3>Adhérents par projet</h3><ul class="lst rep" id="parProjet" style="margin-top:16px"></ul></div><div class="panel"><h3>Activités récentes</h3><ul class="lst act" id="activ" style="margin-top:16px"></ul></div></div></div>
+</section>
+
+<section id="adherentsView" class="view hidden"><div class="panel">
+<div class="panelhead"><div><h3>Base des adhérents</h3><div class="muted">Rechercher, exporter ou imprimer les dossiers.</div></div>
+<div class="toolbar"><button id="export" class="btn light hidden" type="button">Exporter CSV</button><button id="print" class="btn light" type="button">Imprimer</button><button class="btn primary" type="button" data-goto="nouveau">Ajouter</button></div></div>
+<div class="searchrow"><input id="search" type="search" maxlength="60" placeholder="Rechercher nom, prénom, matricule, téléphone…" aria-label="Rechercher"><select id="filter" aria-label="Filtrer par option"><option value="">Toutes les options</option><option>Villa</option><option>Terrain</option><option>Appartement</option></select><select id="filterProj" aria-label="Filtrer par projet"><option value="">Tous les projets</option></select></div>
+<div id="listMessage" class="message" role="alert"></div>
+<div class="tablewrap"><table><thead><tr><th>Prénom et nom</th><th>Matricule</th><th>Téléphone</th><th>Banque</th><th>Option</th><th>Projet</th><th>Frais</th><th>Apport</th><th>Date</th><th class="acts">Actions</th></tr></thead><tbody id="rows"></tbody></table></div></div></section>
+
+<section id="nouveauView" class="view hidden"><div class="panel">
+<div class="panelhead"><div><h3 id="formTitle">Nouvelle adhésion</h3><div class="muted">Les champs marqués * sont obligatoires.</div></div></div>
+<form id="adhForm" class="formgrid" autocomplete="off">
+<div id="editBanner" class="editbanner hidden"></div>
+<div class="section">Informations personnelles</div>
+<div style="grid-column:1/-1;display:flex;align-items:center;gap:16px"><img id="photoPrev" class="photoprev hidden" alt="Aperçu de la photo"><div style="flex:1"><label for="f_photo">Photo d’identité * (JPG, PNG ou WebP)</label><input id="f_photo" name="photo" type="file" accept="image/jpeg,image/png,image/webp" required></div></div>
+<div><label for="f_prenom">Prénom *</label><input id="f_prenom" name="prenom" required maxlength="60"></div>
+<div><label for="f_nom">Nom *</label><input id="f_nom" name="nom" required maxlength="60"></div>
+<div><label for="f_genre">Genre *</label><select id="f_genre" name="genre" required><option value="">Choisir…</option><option>Féminin</option><option>Masculin</option></select></div>
+<div><label for="f_mat">Matricule de solde *</label><input id="f_mat" name="matricule" required maxlength="30" pattern="[A-Za-z0-9\/\- ]{3,30}" title="3 à 30 caractères : lettres, chiffres, / ou -"></div>
+<div><label for="f_cni">N° CNI *</label><input id="f_cni" name="cni" required maxlength="25" pattern="[A-Za-z0-9 ]{5,25}" title="5 à 25 lettres ou chiffres"></div>
+<div><label for="f_tel">Téléphone *</label><input id="f_tel" name="telephone" type="tel" required maxlength="20" pattern="[+0-9 ()\-]{8,20}" title="8 à 20 chiffres (le + est autorisé)"></div>
+<div><label for="f_adr">Adresse *</label><input id="f_adr" name="adresse" required maxlength="150"></div>
+<div><label for="f_prof">Profession *</label><input id="f_prof" name="profession" required maxlength="80"></div>
+<div class="section">Informations financières et acquisition</div>
+<div><label for="f_banque">Banque *</label><input id="f_banque" name="banque" required maxlength="80"></div>
+<div><label for="f_compte">N° compte bancaire *</label><input id="f_compte" name="compte_bancaire" required maxlength="34" pattern="[A-Za-z0-9 ]{5,34}" title="5 à 34 lettres ou chiffres"></div>
+<div><label for="f_frais">Frais d’adhésion *</label><select id="f_frais" name="frais_adhesion" required><option value="">Choisir…</option><option value="26000">26 000 FCFA</option><option value="250000">250 000 FCFA</option></select></div>
+<div><label for="f_apport">Acompte / Apport (FCFA) *</label><input id="f_apport" name="apport" type="number" inputmode="numeric" min="0" max="1000000000" step="1" value="0" required></div>
+<div><label for="f_opt">Option d’acquisition *</label><select id="f_opt" name="option_acquisition" required><option value="">Choisir…</option><option>Villa</option><option>Terrain</option><option>Appartement</option></select></div>
+<div><label for="f_proj">Choix du projet *</label><select id="f_proj" name="projet" required><option value="">Choisir…</option></select></div>
+<div><label for="f_date">Date d’adhésion *</label><input id="f_date" name="date_adhesion" type="date" required></div>
+<div class="actions"><button class="btn light" type="reset">Effacer</button><button id="saveBtn" class="btn primary" type="submit">Enregistrer l’adhésion</button></div>
+<div id="formMessage" class="message" role="alert" style="grid-column:1/-1"></div>
+</form></div></section>
+<section id="archivesView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3>Adhérents archivés</h3><div class="muted">Dossiers retirés de la liste. Seuls les administrateurs peuvent les restaurer.</div></div></div>
+<div id="arcMessage" class="message" role="alert"></div>
+<div class="tablewrap"><table><thead><tr><th>Prénom et nom</th><th>Matricule</th><th>Option</th><th>Date d’adhésion</th><th>Archivé le</th><th class="acts">Action</th></tr></thead><tbody id="arcRows"></tbody></table></div></div></section>
+<section id="projetsView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3>Projets</h3><div class="muted">Les projets proposés aux adhérents dans le formulaire. Réservé aux administrateurs.</div></div></div>
+<form id="projForm" class="formgrid" autocomplete="off">
+<div><label for="pj_nom">Nom du projet *</label><input id="pj_nom" name="nom" required maxlength="80"></div>
+<div><label for="pj_loc">Localisation</label><input id="pj_loc" name="localisation" maxlength="120"></div>
+<div><label for="pj_st">Statut</label><select id="pj_st" name="statut"><option value="en_cours">En cours</option><option value="termine">Terminé</option><option value="suspendu">Suspendu</option></select></div>
+<div><label for="pj_cap">Capacité (nombre de places)</label><input id="pj_cap" name="capacite" type="number" min="0" max="100000" step="1"></div>
+<div><label for="pj_d1">Date de début</label><input id="pj_d1" name="date_debut" type="date"></div>
+<div><label for="pj_d2">Fin prévue</label><input id="pj_d2" name="date_fin_prevue" type="date"></div>
+<div style="grid-column:1/-1"><label for="pj_desc">Description</label><textarea id="pj_desc" name="description" maxlength="600"></textarea></div>
+<div class="actions"><button class="btn light" type="reset">Annuler</button><button id="projSave" class="btn primary" type="submit">Ajouter le projet</button></div></form>
+<div id="projMessage" class="message" role="alert"></div>
+<div class="tablewrap"><table><thead><tr><th>Projet</th><th>Adhérents</th><th>Statut</th><th class="acts">Action</th></tr></thead><tbody id="projRows"></tbody></table></div></div></section>
+<section id="projetView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3 id="pdName"></h3><div class="muted" id="pdMeta"></div></div><button class="btn light" type="button" data-goto="dashboard">← Tableau de bord</button></div><div id="pdInfo" class="pdgrid"></div></div>
+<div class="panel"><div class="panelhead"><div><h3>Membres du projet</h3><div class="muted" id="pdCount"></div></div><div class="toolbar"><select id="pdFilter" aria-label="Filtrer par option"><option value="">Toutes les options</option><option>Terrain</option><option>Villa</option><option>Appartement</option></select><input id="pdSearch" type="search" maxlength="60" placeholder="Rechercher…" aria-label="Rechercher"></div></div>
+<div class="tablewrap"><table><thead><tr><th>Prénom et nom</th><th>Matricule</th><th>Téléphone</th><th>Option</th><th>Frais</th><th>Apport</th><th>Date</th></tr></thead><tbody id="pdRows"></tbody></table></div></div></section>
+<section id="utilisateursView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3>Agents de saisie</h3><div class="muted">Créez les comptes des agents : ils enregistrent des adhésions mais ne voient pas les données sensibles. Réservé aux administrateurs.</div></div></div>
+<form id="usrForm" class="formgrid" autocomplete="off"><div><label for="u_nom">Nom complet *</label><input id="u_nom" required minlength="2" maxlength="80"></div>
+<div><label for="u_mail">Adresse e-mail *</label><input id="u_mail" type="email" required maxlength="120"></div>
+<div><label for="u_pw">Mot de passe temporaire * (10 caractères minimum)</label><input id="u_pw" type="password" required minlength="10" maxlength="72" autocomplete="new-password"></div>
+<div class="actions"><button id="usrSave" class="btn primary" type="submit">Créer l'agent</button></div></form>
+<div id="usrMessage" class="message" role="alert"></div>
+<div class="tablewrap"><table><thead><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Statut</th><th class="acts">Action</th></tr></thead><tbody id="usrRows"></tbody></table></div></div></section>
+</section>
+<footer id="foot" class="hidden">COHAG — Accès réservé au personnel autorisé</footer>
+</main></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
+<script>
+'use strict';
+/* Clé publique uniquement (jamais de service_role ici). La vraie protection = RLS Supabase. */
+const SUPABASE_URL='https://zymyvfctoldjybbnmkjs.supabase.co';
+const SUPABASE_KEY='sb_publishable_cNy2H5DvKHJvIODpMXUo7w_bu1BQRJA';
+const IDLE_MS=15*60*1000, MAX_TRIES=5, LOCK_S=60;
+let client=null,user=null,profile=null,items=[],projets=[],curProjet=null,projEdit=null,photoBlob=null,editPhoto=null,photoUrls={},archived=[],editId=null,tries=0,lockUntil=0,idleT=null,opening=false;
+const $=id=>document.getElementById(id);
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money=x=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Number(x)||0)+' FCFA';
+const ST={en_cours:'En cours',termine:'Terminé',suspendu:'Suspendu'};
+const pn=id=>projets.find(p=>p.id===id)?.nom||'—';
+const ini=(a,b)=>((a||'?')[0]+(b||'')[0]).toUpperCase();
+const ago=d=>{const m=Math.max(0,Math.round((Date.now()-new Date(d))/60000));return m<60?'Il y a '+m+' min':m<1440?'Il y a '+Math.round(m/60)+' h':'Il y a '+Math.round(m/1440)+' j'};
+const isAdmin=()=>profile?.role==='admin';
+function msg(id,t,cls=''){const e=$(id);e.textContent=t;e.className='message '+cls}
+const VIEWS={dashboard:'Tableau de bord',adherents:'Base des adhérents',nouveau:'Nouvelle adhésion',archives:'Archives',projets:'Projets',projet:'Détail du projet',utilisateurs:'Agents de saisie'};
+function show(name){
+  if(!user||!VIEWS[name]||((name==='projets'||name==='utilisateurs')&&!isAdmin()))return;
+  Object.keys(VIEWS).forEach(v=>$(v+'View').classList.toggle('hidden',v!==name));
+  document.querySelectorAll('.nav').forEach(b=>{const on=b.dataset.view===name;b.classList.toggle('active',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
+  $('pageTitle').textContent=VIEWS[name];
+  if(name==='utilisateurs')usrLoad();
+}
+const go=n=>{if(n==='nouveau')resetEdit();show(n)};
+document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.view));document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>go(b.dataset.goto));
+
+function initSupabase(){
+  if(!window.supabase){msg('loginMessage','Le service est momentanément indisponible. Vérifiez votre connexion Internet puis rechargez la page.','error');return false}
+  client=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:false}});
+  return true;
+}
+/* Verrouillage temporaire après plusieurs échecs (confort côté client ; l'anti-brute-force réel est dans Supabase Auth). */
+function lockTick(){
+  const left=Math.ceil((lockUntil-Date.now())/1000);
+  if(left>0){$('loginBtn').disabled=true;msg('loginMessage','Trop de tentatives. Réessayez dans '+left+' s.','error');setTimeout(lockTick,1000)}
+  else{$('loginBtn').disabled=false;tries=0;msg('loginMessage','')}
+}
+$('loginForm').onsubmit=async e=>{
+  e.preventDefault();
+  if(Date.now()<lockUntil)return;
+  if(!client&&!initSupabase())return;
+  const email=$('email').value.trim(),pw=$('password').value;
+  if(!email||!pw){msg('loginMessage','Saisissez votre e-mail et votre mot de passe.','error');return}
+  $('loginBtn').disabled=true;msg('loginMessage','Connexion en cours…');
+  const {data,error}=await client.auth.signInWithPassword({email,password:pw});
+  $('password').value='';
+  if(error){
+    $('loginBtn').disabled=false;
+    if(++tries>=MAX_TRIES){lockUntil=Date.now()+LOCK_S*1000;lockTick()}
+    else msg('loginMessage','E-mail ou mot de passe incorrect.','error');
+    return;
+  }
+  tries=0;await openApp(data.user);$('loginBtn').disabled=false;
+};
+
+async function openApp(u){
+  if(opening)return;opening=true;
+  try{
+    const {data:p,error}=await client.from('profiles').select('id,full_name,role,is_active').eq('id',u.id).maybeSingle();
+    if(error||!p||!p.is_active){await client.auth.signOut();msg('loginMessage','Accès refusé. Contactez l’administrateur.','error');return}
+    user=u;profile=p;
+    $('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('logout').classList.remove('hidden');$('foot').classList.remove('hidden');
+    document.querySelectorAll('.nav').forEach(b=>b.classList.remove('hidden'));document.querySelector('.nav[data-view=projets]').classList.toggle('hidden',!isAdmin());document.querySelector('.nav[data-view=utilisateurs]').classList.toggle('hidden',!isAdmin());
+    $('export').classList.toggle('hidden',!isAdmin());
+    $('status').textContent='● Connexion sécurisée';
+    const nm=p.full_name||u.email;$('userName').textContent=nm;$('userRole').textContent=isAdmin()?'Administrateur':'Agent de saisie';$('avatar').textContent=ini(nm.split(' ')[0],nm.split(' ')[1]);
+    $('f_date').max=new Date().toISOString().slice(0,10);
+    startIdle();await load();show('dashboard');
+  }finally{opening=false}
+}
+async function load(){
+  /* Les données sensibles (CNI, compte bancaire) ne sont chargées que pour un administrateur. */
+  const {data:pj}=await client.from('projets').select('id,nom,actif,description,localisation,statut,date_debut,date_fin_prevue,capacite').order('nom');projets=pj||[];
+  const priv=isAdmin()?',adherent_private(cni,adresse,banque,compte_bancaire)':'';
+  const {data,error}=await client.from('adherents').select('id,prenom,nom,genre,matricule_solde,telephone,profession,frais_adhesion,apport_fcfa,option_acquisition,projet_id,photo_path,date_adhesion,created_at,created_by,archived_at'+priv).order('created_at',{ascending:false});
+  if(error){msg('formMessage','Impossible de charger les données. Réessayez ou reconnectez-vous.','error');return}
+  const all=(data||[]).map(a=>({...a,matricule:a.matricule_solde,apport:a.apport_fcfa,priv:(Array.isArray(a.adherent_private)?a.adherent_private[0]:a.adherent_private)||{}}));items=all.filter(a=>!a.archived_at);archived=all.filter(a=>a.archived_at);await loadPhotos(all);
+  render();
+}
+function render(){
+  $('total').textContent=items.length;
+  $('fees').textContent=money(items.reduce((s,a)=>s+Number(a.frais_adhesion||0),0));
+  $('apports').textContent=money(items.reduce((s,a)=>s+Number(a.apport||0),0));
+  const n=new Date();
+  $('recent').textContent=items.filter(a=>{const d=new Date(a.date_adhesion+'T00:00:00');return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()}).length;
+  $('recentRows').innerHTML=items.slice(0,5).map((a,i)=>`<tr><td>${i+1}</td><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.option_acquisition)}</td><td>${money(a.frais_adhesion)}</td><td>${esc(a.date_adhesion)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Aucune adhésion enregistrée. Cliquez sur « Nouvelle adhésion » pour commencer.</td></tr>';
+  const cols={Terrain:'#2d7df6',Villa:'#1fb85a',Appartement:'#ff9a2e'};
+  $('repart').innerHTML=Object.keys(cols).map(k=>{const c=items.filter(a=>a.option_acquisition===k).length,p=items.length?Math.round(c*100/items.length):0;return `<li><div><span>Option ${k}</span><b>${c}</b></div><div class="bar"><i style="width:${p}%;--c:${cols[k]}"></i></div></li>`}).join('');
+  $('activ').innerHTML=items.slice(0,3).map((a,i)=>`<li style="--c:${['#c04be0','#ff9a2e','#1fb85a'][i]}"><div>Nouvelle adhésion : ${esc(a.prenom)} ${esc(a.nom)}<small>${esc(ago(a.created_at))}</small></div></li>`).join('')||'<li>Aucune activité.</li>';
+  $('arcRows').innerHTML=archived.map(a=>`<tr><td><b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.option_acquisition)}</td><td>${esc(a.date_adhesion)}</td><td>${esc(new Date(a.archived_at).toLocaleDateString('fr-FR'))}</td><td class="acts">${isAdmin()?`<button class="btn mini primary" type="button" data-act="restore" data-id="${esc(a.id)}">Restaurer</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Aucun adhérent archivé.</td></tr>';
+  renderProjets();
+  table();
+}
+function table(){
+  const q=$('search').value.trim().toLocaleLowerCase('fr'),f=$('filter').value,fp=$('filterProj').value;
+  const arr=items.filter(a=>(!f||a.option_acquisition===f)&&(!fp||a.projet_id===fp)&&[a.prenom,a.nom,a.matricule,a.telephone,a.profession,a.priv.banque].some(x=>String(x||'').toLocaleLowerCase('fr').includes(q)));
+  $('rows').innerHTML=arr.map(a=>`<tr><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.telephone)}</td><td>${esc(a.priv.banque||'—')}</td><td>${esc(a.option_acquisition)}</td><td>${esc(pn(a.projet_id))}</td><td>${money(a.frais_adhesion)}</td><td>${money(a.apport)}</td><td>${esc(a.date_adhesion)}</td><td class="acts">${(isAdmin()||a.created_by===user?.id)?`<button class="btn mini light" type="button" data-act="edit" data-id="${esc(a.id)}">Modifier</button><button class="btn mini danger" type="button" data-act="arch" data-id="${esc(a.id)}">Archiver</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="10" class="empty">Aucun résultat pour cette recherche.</td></tr>';
+}
+function fillProjets(sel){
+  const el=$('f_proj'),cur=sel!==undefined?sel:el.value;
+  el.innerHTML='<option value="">'+(projets.some(p=>p.actif)?'Choisir…':'Aucun projet disponible')+'</option>'+projets.filter(p=>p.actif||p.id===cur).map(p=>`<option value="${esc(p.id)}">${esc(p.nom)}</option>`).join('');
+  el.value=cur||'';
+}
+function renderProjets(){
+  fillProjets();
+  const tot=items.length,cols=['#2d7df6','#1fb85a','#ff9a2e','#c04be0','#17a7a0','#e0457b'];
+  const rows=projets.filter(p=>p.actif||items.some(a=>a.projet_id===p.id)).map((p,i)=>({n:p.nom,c:items.filter(a=>a.projet_id===p.id).length,col:cols[i%cols.length]}));
+  const none=items.filter(a=>!a.projet_id).length;if(none)rows.push({n:'Non renseigné',c:none,col:'#9aa7c0'});
+  $('parProjet').innerHTML=rows.map(r=>`<li><div><span>${esc(r.n)}</span><b>${r.c}</b></div><div class="bar"><i style="width:${tot?Math.round(r.c*100/tot):0}%;--c:${r.col}"></i></div></li>`).join('')||'<li>Aucun projet pour le moment.</li>';
+  const by=(m,o)=>m.filter(a=>a.option_acquisition===o).length;
+  $('projRows').innerHTML=projets.map(p=>`<tr><td><b>${esc(p.nom)}</b><br><small>${esc(ST[p.statut]||'')}${p.localisation?' · '+esc(p.localisation):''}</small></td><td>${items.filter(a=>a.projet_id===p.id).length}</td><td>${p.actif?'Actif':'Désactivé'}</td><td class="acts"><button class="btn mini light" type="button" data-act="edit" data-pid="${esc(p.id)}">Modifier</button><button class="btn mini ${p.actif?'danger':'primary'}" type="button" data-pid="${esc(p.id)}">${p.actif?'Désactiver':'Activer'}</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">Aucun projet. Ajoutez le premier ci-dessus.</td></tr>';
+  $('projCards').innerHTML=projets.filter(p=>p.actif||items.some(a=>a.projet_id===p.id)).map(p=>{const m=items.filter(a=>a.projet_id===p.id),cap=p.capacite||0,tx=cap?Math.min(100,Math.round(m.length*100/cap)):0;return `<button class="pcard" type="button" data-open="${esc(p.id)}"><span class="badge ${esc(p.statut||'')}">${esc(ST[p.statut]||'—')}</span><b>${esc(p.nom)}</b><small>${esc(p.localisation||'Localisation non précisée')}</small><div class="bar"><i style="width:${tx}%;--c:#2d7df6"></i></div><small>${m.length} adhérent${m.length>1?'s':''}${cap?' sur '+cap+' places':''}</small><small>Terrain ${by(m,'Terrain')} · Villa ${by(m,'Villa')} · Appart. ${by(m,'Appartement')}</small></button>`}).join('')||'<div class="empty">Aucun projet pour le moment. Un administrateur peut en créer dans l’onglet Projets.</div>';
+  const fp=$('filterProj'),cv=fp.value;fp.innerHTML='<option value="">Tous les projets</option>'+projets.map(p=>`<option value="${esc(p.id)}">${esc(p.nom)}</option>`).join('');fp.value=cv;
+  if(curProjet)renderProjet();
+}
+$('projForm').onsubmit=async e=>{
+  e.preventDefault();if(!user||!isAdmin())return;
+  const g=n=>$('projForm').elements[n].value.trim();
+  const rec={nom:g('nom'),localisation:g('localisation')||null,statut:g('statut'),date_debut:g('date_debut')||null,date_fin_prevue:g('date_fin_prevue')||null,capacite:g('capacite')===''?null:Number(g('capacite')),description:g('description')||null};
+  if(rec.nom.length<2)return;
+  msg('projMessage','Enregistrement…');
+  const t=client.from('projets'),{data:d,error}=await (projEdit?t.update(rec).eq('id',projEdit):t.insert(rec)).select('id');
+  if(error||!d||!d.length){console.error('projet',error);msg('projMessage',error&&error.code==='23505'?'Ce projet existe déjà.':'Enregistrement impossible. (code '+(error?error.code||'?':'droits')+')','error');return}
+  $('projForm').reset();await load();msg('projMessage','Projet enregistré.','success');
+};
+$('projForm').addEventListener('reset',()=>{projEdit=null;$('projSave').textContent='Ajouter le projet'});
+$('projRows').onclick=async e=>{
+  const b=e.target.closest('button[data-pid]');if(!b||!user||!isAdmin())return;
+  const p=projets.find(x=>x.id===b.dataset.pid);if(!p)return;
+  if(b.dataset.act==='edit'){const f=$('projForm').elements;['nom','localisation','statut','date_debut','date_fin_prevue','capacite','description'].forEach(k=>f[k].value=p[k]==null?'':String(p[k]));projEdit=p.id;$('projSave').textContent='Enregistrer les modifications';msg('projMessage','Modification de « '+p.nom+' ».');f.nom.focus();return}
+  const {data:d,error}=await client.from('projets').update({actif:!p.actif}).eq('id',p.id).select('id');
+  if(error||!d||!d.length){msg('projMessage','Action impossible.','error');return}
+  await load();msg('projMessage',p.actif?'Projet désactivé : il n’est plus proposé dans le formulaire.':'Projet activé.','success');
+};
+const av=a=>photoUrls[a.photo_path]?`<img class="avs" src="${esc(photoUrls[a.photo_path])}" alt="">`:`<span class="avs">${esc(ini(a.prenom,a.nom))}</span>`;
+async function loadPhotos(list){
+  photoUrls={};const paths=[...new Set(list.map(a=>a.photo_path).filter(Boolean))];if(!paths.length)return;
+  const {data}=await client.storage.from('photos').createSignedUrls(paths,3600);
+  (data||[]).forEach(x=>{if(x.signedUrl&&!x.error)photoUrls[x.path]=x.signedUrl});
+}
+/* Photo : contrôle du type/poids, puis recompression JPEG 480 px (supprime aussi les métadonnées EXIF). */
+function toJpeg(file){return new Promise((ok,ko)=>{
+  if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>8*1048576)return ko(new Error('format'));
+  const r=new FileReader();r.onerror=()=>ko(new Error('read'));
+  r.onload=()=>{const im=new Image();im.onerror=()=>ko(new Error('img'));
+    im.onload=()=>{const k=Math.min(1,480/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*k);c.height=Math.round(im.height*k);c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      c.toBlob(b=>b?ok({blob:b,url:c.toDataURL('image/jpeg',.85)}):ko(new Error('enc')),'image/jpeg',.85)};
+    im.src=r.result};
+  r.readAsDataURL(file)})}
+$('f_photo').onchange=async e=>{
+  const f=e.target.files[0];photoBlob=null;$('photoPrev').classList.add('hidden');if(!f)return;
+  try{const r=await toJpeg(f);photoBlob=r.blob;$('photoPrev').src=r.url;$('photoPrev').classList.remove('hidden');msg('formMessage','')}
+  catch(_){e.target.value='';msg('formMessage','Photo refusée : choisissez une image JPG, PNG ou WebP de moins de 8 Mo.','error')}
+};
+function openProjet(id){curProjet=id;$('pdFilter').value='';$('pdSearch').value='';renderProjet();show('projet')}
+function renderProjet(){
+  const p=projets.find(x=>x.id===curProjet);if(!p)return;
+  const m=items.filter(a=>a.projet_id===p.id),sum=k=>m.reduce((s,a)=>s+Number(a[k]||0),0),cap=p.capacite||0;
+  const kv=(l,v,o)=>`<div class="kv"${o?` data-opt="${o}" role="button" tabindex="0"`:''}><small>${l}</small><b>${esc(v)}</b></div>`;
+  $('pdName').textContent=p.nom;$('pdMeta').textContent=(ST[p.statut]||'—')+(p.localisation?' · '+p.localisation:'');
+  $('pdInfo').innerHTML=kv('Statut',ST[p.statut]||'—')+kv('Localisation',p.localisation||'—')+kv('Début',p.date_debut||'—')+kv('Fin prévue',p.date_fin_prevue||'—')+kv('Capacité',cap?cap+' places':'—')+kv('Adhérents',m.length+(cap?' ('+Math.min(100,Math.round(m.length*100/cap))+' %)':''))+kv('Terrains',by(m,'Terrain'),'Terrain')+kv('Villas',by(m,'Villa'),'Villa')+kv('Appartements',by(m,'Appartement'),'Appartement')+kv('Frais d’adhésion',money(sum('frais_adhesion')))+kv('Apports',money(sum('apport')))+(p.description?`<div class="kv wide"><small>Description</small><b>${esc(p.description)}</b></div>`:'');
+  const f=$('pdFilter').value,q=$('pdSearch').value.trim().toLocaleLowerCase('fr');
+  const arr=m.filter(a=>(!f||a.option_acquisition===f)&&[a.prenom,a.nom,a.matricule,a.telephone].some(x=>String(x||'').toLocaleLowerCase('fr').includes(q)));
+  $('pdCount').textContent=arr.length+' membre'+(arr.length>1?'s':'')+(f?' · '+f:'');
+  $('pdRows').innerHTML=arr.map(a=>`<tr><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.telephone)}</td><td>${esc(a.option_acquisition)}</td><td>${money(a.frais_adhesion)}</td><td>${money(a.apport)}</td><td>${esc(a.date_adhesion)}</td></tr>`).join('')||'<tr><td colspan="7" class="empty">Aucun membre pour ce choix.</td></tr>';
+}
+$('pdFilter').onchange=renderProjet;$('pdSearch').oninput=renderProjet;
+$('pdInfo').onclick=e=>{const k=e.target.closest('[data-opt]');if(k){$('pdFilter').value=$('pdFilter').value===k.dataset.opt?'':k.dataset.opt;renderProjet()}};
+$('projCards').onclick=e=>{const c=e.target.closest('[data-open]');if(c)openProjet(c.dataset.open)};
+function setMode(edit){
+  $('f_photo').required=!edit;
+  $('formTitle').textContent=edit?'Modifier l’adhésion':'Nouvelle adhésion';
+  $('saveBtn').textContent=edit?'Enregistrer les modifications':'Enregistrer l’adhésion';
+  const lock=edit&&!isAdmin();['f_cni','f_adr','f_banque','f_compte'].forEach(i=>$(i).disabled=lock);
+  const b=$('editBanner');b.classList.toggle('hidden',!edit);
+  b.textContent=lock?'Mode modification : les informations sensibles (CNI, adresse, banque, compte) ne peuvent être modifiées que par un administrateur.':'Mode modification : cliquez sur « Effacer » ou « Nouvelle adhésion » pour annuler.';
+}
+function resetEdit(){if(editId){editId=null;$('adhForm').reset()}}
+function startEdit(a){
+  const f=$('adhForm');editId=null;f.reset();fillProjets(a.projet_id||'');editPhoto=a.photo_path||null;photoBlob=null;{const pu=photoUrls[a.photo_path];$('photoPrev').classList.toggle('hidden',!pu);if(pu)$('photoPrev').src=pu}
+  const set=(n,v)=>{f.elements[n].value=v==null?'':String(v)};
+  ['prenom','nom','genre','matricule','telephone','profession','frais_adhesion','apport','option_acquisition','date_adhesion'].forEach(k=>set(k,a[k]));
+  if(isAdmin())['cni','adresse','banque','compte_bancaire'].forEach(k=>set(k,a.priv[k]));
+  editId=a.id;setMode(true);msg('formMessage','');show('nouveau');
+}
+async function setArchive(id,on,box){
+  msg(box,'Traitement…');
+  const patch=on?{archived_at:new Date().toISOString(),archived_by:user.id}:{archived_at:null,archived_by:null};
+  const {data:ad,error}=await client.from('adherents').update(patch).eq('id',id).select('id');
+  if(!error&&(!ad||!ad.length)){msg(box,'Action refusée : vous ne pouvez agir que sur les dossiers que vous avez créés.','error');return}
+  if(error){console.error('archive',error);msg(box,'Action impossible. Vérifiez vos droits ou réessayez. (code '+(error.code||'?')+')','error');return}
+  await load();msg(box,on?'Adhérent archivé. Vous pouvez le retrouver dans « Archives ».':'Adhérent restauré.','success');
+}
+$('adhForm').addEventListener('reset',()=>{photoBlob=null;editPhoto=null;$('photoPrev').classList.add('hidden');editId=null;setMode(false);msg('formMessage','')});
+$('rows').onclick=e=>{
+  const b=e.target.closest('button[data-act]');if(!b||!user)return;
+  const a=items.find(x=>String(x.id)===b.dataset.id);if(!a)return;
+  if(b.dataset.act==='edit')startEdit(a);
+  else if(confirm('Archiver '+a.prenom+' '+a.nom+' ?\nLe dossier sera retiré de la liste mais pourra être restauré par un administrateur.'))setArchive(a.id,true,'listMessage');
+};
+$('arcRows').onclick=e=>{
+  const b=e.target.closest('button[data-act="restore"]');if(!b||!user||!isAdmin())return;
+  if(confirm('Restaurer cet adhérent ?'))setArchive(b.dataset.id,false,'arcMessage');
+};
+$('search').oninput=table;$('filter').onchange=table;$('filterProj').onchange=table;$('print').onclick=()=>window.print();
+
+/* Export CSV (administrateur) : neutralise l'injection de formules Excel (=, +, -, @). */
+const csvCell=x=>{let s=String(x??'');if(/^[=+\-@\t\r]/.test(s))s="'"+s;return '"'+s.replace(/"/g,'""')+'"'};
+$('export').onclick=()=>{
+  if(!isAdmin())return;
+  const h=['Prénom','Nom','Genre','Matricule','CNI','Téléphone','Profession','Adresse','Banque','N° compte bancaire','Frais adhésion FCFA','Apport FCFA','Option','Projet','Date adhésion'];
+  const rows=items.map(a=>[a.prenom,a.nom,a.genre,a.matricule,a.priv.cni,a.telephone,a.profession,a.priv.adresse,a.priv.banque,a.priv.compte_bancaire,a.frais_adhesion,a.apport,a.option_acquisition,pn(a.projet_id),a.date_adhesion]);
+  const csv='\ufeff'+[h,...rows].map(r=>r.map(csvCell).join(';')).join('\r\n');
+  const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');a.href=u;a.download='COHAG_adherents_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+};
+
+$('adhForm').onsubmit=async e=>{
+  e.preventDefault();
+  const form=e.currentTarget;
+  if(!user||!form.reportValidity())return;
+  const fd=new FormData(form),g=k=>String(fd.get(k)||'').trim();
+  const apport=Number(g('apport')),frais=Number(g('frais_adhesion'));
+  if(!Number.isInteger(apport)||apport<0||![26000,250000].includes(frais)){msg('formMessage','Montants invalides.','error');return}
+  if(g('date_adhesion')>new Date().toISOString().slice(0,10)){msg('formMessage','La date d’adhésion ne peut pas être dans le futur.','error');return}
+  const rec={prenom:g('prenom'),nom:g('nom'),genre:g('genre'),matricule_solde:g('matricule'),telephone:g('telephone'),profession:g('profession'),frais_adhesion:frais,apport_fcfa:apport,option_acquisition:g('option_acquisition'),projet_id:g('projet')||null,date_adhesion:g('date_adhesion'),created_by:user.id,updated_by:user.id};
+  if(editId){
+    $('saveBtn').disabled=true;msg('formMessage','Enregistrement…');
+    const upd={...rec};delete upd.created_by;
+    let newPath=null;
+    if(photoBlob){newPath=user.id+'/'+crypto.randomUUID()+'.jpg';const up=await client.storage.from('photos').upload(newPath,photoBlob,{contentType:'image/jpeg',upsert:false});if(up.error){$('saveBtn').disabled=false;console.error('photo',up.error);msg('formMessage','Envoi de la photo impossible. Réessayez.','error');return}upd.photo_path=newPath}
+    let {data:ud,error:ue}=await client.from('adherents').update(upd).eq('id',editId).select('id');
+    if(!ue&&(!ud||!ud.length))ue={code:'RLS'};
+    if(!ue&&isAdmin()){({error:ue}=await client.from('adherent_private').update({cni:g('cni'),adresse:g('adresse'),banque:g('banque'),compte_bancaire:g('compte_bancaire')}).eq('adherent_id',editId))}
+    $('saveBtn').disabled=false;
+    {const del=ue?newPath:editPhoto;if(newPath&&del)await client.storage.from('photos').remove([del])}
+    if(ue){console.error('update',ue);msg('formMessage',ue.code==='RLS'?'Vous ne pouvez modifier que les dossiers que vous avez créés.':ue.code==='23505'?'Ce matricule ou ce n° de CNI est déjà utilisé.':'Modification impossible. Vérifiez les champs ou vos droits. (code '+(ue.code||'?')+')','error');return}
+    form.reset();await load();show('adherents');msg('listMessage','Modifications enregistrées.','success');return;
+  }
+  if(!photoBlob){msg('formMessage','Ajoutez la photo d’identité de l’adhérent.','error');return}
+  $('saveBtn').disabled=true;msg('formMessage','Enregistrement…');
+  const path=user.id+'/'+crypto.randomUUID()+'.jpg';
+  const up=await client.storage.from('photos').upload(path,photoBlob,{contentType:'image/jpeg',upsert:false});
+  if(up.error){$('saveBtn').disabled=false;console.error('photo',up.error);msg('formMessage','Envoi de la photo impossible. Réessayez.','error');return}
+  const {error}=await client.rpc('cohag_create_adherent',{p_prenom:rec.prenom,p_nom:rec.nom,p_genre:rec.genre,p_matricule:rec.matricule_solde,p_telephone:rec.telephone,p_profession:rec.profession,p_frais:rec.frais_adhesion,p_apport:rec.apport_fcfa,p_option:rec.option_acquisition,p_date:rec.date_adhesion,p_cni:g('cni'),p_adresse:g('adresse'),p_banque:g('banque'),p_compte:g('compte_bancaire'),p_projet:g('projet')||null,p_photo:path});
+  $('saveBtn').disabled=false;
+  if(error){await client.storage.from('photos').remove([path]);console.error('create adherent',error);msg('formMessage',error.code==='23505'?'Ce matricule ou ce n° de CNI est déjà enregistré.':'Enregistrement impossible. Vérifiez les champs ou vos droits. (code '+(error.code||'?')+')','error');return}
+  form.reset();await load();show('adherents');msg('listMessage','Adhésion enregistrée avec succès.','success');
+};
+
+/* Déconnexion + nettoyage complet des données en mémoire et à l'écran. */
+function resetUI(text){
+  user=null;profile=null;items=[];projets=[];curProjet=null;photoUrls={};archived=[];editId=null;clearTimeout(idleT);
+  ['rows','recentRows','arcRows','projRows','parProjet','projCards','pdRows','usrRows'].forEach(i=>$(i).innerHTML='');
+  $('adhForm').reset();$('search').value='';$('filter').value='';
+  $('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('logout').classList.add('hidden');$('foot').classList.add('hidden');
+  document.querySelectorAll('.nav').forEach(b=>b.classList.add('hidden'));
+  $('pageTitle').textContent='Connexion';$('userName').textContent='Accès sécurisé';$('userRole').textContent='';$('avatar').textContent='🔒';$('repart').innerHTML='';$('activ').innerHTML='';$('status').textContent='● Hors connexion';
+  $('password').value='';if(text)msg('loginMessage',text);
+}
+async function logout(text){if(client)await client.auth.signOut();resetUI(text)}
+$('logout').onclick=()=>logout('Vous êtes déconnecté.');
+function startIdle(){clearTimeout(idleT);idleT=setTimeout(()=>user&&logout('Session expirée après 15 minutes d’inactivité.'),IDLE_MS)}
+['click','keydown','mousemove','touchstart'].forEach(ev=>document.addEventListener(ev,()=>{if(user)startIdle()},{passive:true}));
+
+/* Gestion des agents de saisie : passe par la fonction sécurisée « gestion-agents » (le client ne crée jamais de compte lui-même). */
+async function usrCall(body){const {data,error}=await client.functions.invoke('gestion-agents',{body});if(error||!data||data.error)throw new Error((data&&data.error)||'Service indisponible. Réessayez.');return data}
+async function usrLoad(){
+  try{const d=await usrCall({action:'list'});
+    $('usrRows').innerHTML=d.users.map(u=>`<tr><td><b>${esc(u.full_name||'—')}</b></td><td>${esc(u.email)}</td><td>${u.role==='admin'?'Administrateur':'Agent de saisie'}</td><td>${u.is_active?'Actif':'Désactivé'}</td><td class="acts">${u.role==='admin'||u.id===user.id?'—':`<button class="btn mini ${u.is_active?'danger':'primary'}" type="button" data-uid="${esc(u.id)}" data-on="${u.is_active?0:1}">${u.is_active?'Désactiver':'Réactiver'}</button>`}</td></tr>`).join('')}
+  catch(e){msg('usrMessage',e.message,'error')}
+}
+$('usrForm').onsubmit=async e=>{
+  e.preventDefault();if(!user||!isAdmin())return;
+  $('usrSave').disabled=true;msg('usrMessage','Création du compte…');
+  try{await usrCall({action:'create',full_name:$('u_nom').value.trim(),email:$('u_mail').value.trim(),password:$('u_pw').value});
+    $('usrForm').reset();await usrLoad();msg('usrMessage','Agent créé. Transmettez-lui son e-mail et son mot de passe temporaire séparément.','success')}
+  catch(err){msg('usrMessage',err.message,'error')}
+  $('usrSave').disabled=false;
+};
+$('usrRows').onclick=async e=>{
+  const b=e.target.closest('button[data-uid]');if(!b||!user||!isAdmin())return;
+  if(!confirm(b.dataset.on==='1'?'Réactiver ce compte ?':'Désactiver ce compte ? L’agent ne pourra plus se connecter.'))return;
+  try{await usrCall({action:'set_active',id:b.dataset.uid,active:b.dataset.on==='1'});await usrLoad();msg('usrMessage','Compte mis à jour.','success')}
+  catch(err){msg('usrMessage',err.message,'error')}
+};
+
+if(initSupabase()){
+  client.auth.getSession().then(({data})=>{if(data.session?.user)openApp(data.session.user)});
+  client.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_OUT'&&user)resetUI('Session terminée. Reconnectez-vous.')});
+}
+if("serviceWorker" in navigator)window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
+</script>
+</body>
+</html>
