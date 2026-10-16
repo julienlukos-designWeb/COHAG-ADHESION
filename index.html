@@ -259,7 +259,7 @@ textarea{width:100%;min-height:80px;border:1px solid #d5ddec;border-radius:11px;
 <div id="usrMessage" class="message" role="alert"></div>
 <div class="tablewrap"><table><thead><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Statut</th><th class="acts">Action</th></tr></thead><tbody id="usrRows"></tbody></table></div></div></section>
 </section>
-<footer id="foot" class="hidden">COHAG — Accès réservé au personnel autorisé</footer>
+<footer id="foot">COHAG — Accès réservé au personnel autorisé<br>Conçu par Gend Julien Dath Yanghane SENE, mle 15302/S</footer>
 </main></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js" crossorigin="anonymous"></script>
@@ -520,7 +520,7 @@ function resetUI(text){
   user=null;profile=null;items=[];projets=[];curProjet=null;photoUrls={};archived=[];editId=null;clearTimeout(idleT);
   ['rows','recentRows','arcRows','projRows','parProjet','projCards','pdRows','usrRows'].forEach(i=>$(i).innerHTML='');
   $('adhForm').reset();$('search').value='';$('filter').value='';
-  $('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('logout').classList.add('hidden');$('foot').classList.add('hidden');
+  $('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('logout').classList.add('hidden');
   document.querySelectorAll('.nav').forEach(b=>b.classList.add('hidden'));
   $('pageTitle').textContent='Connexion';$('userName').textContent='Accès sécurisé';$('userRole').textContent='';$('avatar').textContent='🔒';$('repart').innerHTML='';$('activ').innerHTML='';$('status').textContent='● Hors connexion';
   $('password').value='';if(text)msg('loginMessage',text);
