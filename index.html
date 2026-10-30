@@ -162,6 +162,44 @@ textarea{width:100%;min-height:80px;border:1px solid #d5ddec;border-radius:11px;
 .kv[data-opt]{cursor:pointer;box-shadow:0 3px 0 #d7e0f3}.kv[data-opt]:hover{background:#e8efff}
 .avs{width:34px;height:34px}img.avs{object-fit:cover}
 .photoprev{width:96px;height:96px;object-fit:cover;border-radius:14px;border:3px solid #fff;box-shadow:0 6px 14px #1b306033}
+/* ===== Gestion de projet ===== */
+.nav[data-view=gestion]{--c1:#ff6b9a;--c2:#d6245f;--sh:#8f1240}
+.hero.gphero{padding:26px 28px;background:linear-gradient(100deg,#6d1038,#d6245f 52%,#ff8a3d);box-shadow:0 20px 40px #d6245f38,inset 0 1px #ffffff90}
+.hero.gphero h2{font-size:30px}
+.gptabs{display:flex;gap:8px;overflow-x:auto;padding:4px 2px 14px;margin-bottom:6px;scrollbar-width:thin}
+.gptab{flex:none;border:0;border-radius:11px;padding:9px 14px;font:700 12px var(--font);cursor:pointer;color:#3d4c70;background:linear-gradient(180deg,#fff,#e9eefb);box-shadow:0 3px 0 #ced8ee,0 6px 10px #20366012,inset 0 1px #fff;transition:transform .12s}
+.gptab:hover{transform:translateY(-1px)}.gptab:active{transform:translateY(2px);box-shadow:0 1px 0 #ced8ee}
+.gptab.on{color:#fff;background:linear-gradient(180deg,#ff6b9a,#d6245f);box-shadow:0 3px 0 #8f1240,0 6px 12px #d6245f40,inset 0 1px #ffffff80}
+.gptab.add{color:#0b7a45;background:linear-gradient(180deg,#fff,#e2fbf3);box-shadow:0 3px 0 #b6e8d2,inset 0 1px #fff}
+.lnk{border:0;background:none;padding:0;font:700 13px var(--font);color:#1f3380;cursor:pointer;text-align:left}.lnk:hover{text-decoration:underline}
+.num{text-align:right}
+tr.bad td{background:#fff1f0}tr.bad .dt{color:var(--danger);font-weight:800}
+tfoot td{font-weight:800;color:#14285f;background:#f4f7ff;border-top:2px solid #d5ddec}
+.gpsum tbody tr{cursor:pointer}.gpsum .tot td{font-weight:800;color:#14285f;background:#f4f7ff}.gpsum .grand td{font-weight:900;color:#fff;background:linear-gradient(90deg,#d6245f,#ff8a3d)}
+.gpres{list-style:none;margin:12px 0 0;padding:0;display:grid;gap:8px}
+.gpres button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:10px;text-align:left;cursor:pointer;border:1px solid var(--line);border-radius:12px;padding:11px 14px;background:linear-gradient(180deg,#fff,#f6f8ff);font:13px var(--font);color:var(--ink);box-shadow:0 3px 0 #dfe6f5}
+.gpres button:hover{background:#eef3ff}.gpres button:active{transform:translateY(2px);box-shadow:none}
+.gpres small{display:block;color:var(--muted)}.gpres b{color:#1f3380}
+.tag{display:inline-block;font-size:10px;font-weight:800;padding:3px 8px;border-radius:20px;background:#ffe3ec;color:#a3164a;white-space:nowrap}
+.gpdlg{width:min(780px,calc(100vw - 16px));max-height:calc(100vh - 24px);border:0;border-radius:20px;padding:22px;color:var(--ink);box-shadow:0 30px 60px #0b1d5266}
+.gpdlg::backdrop{background:#0b1d5299}
+.gpdh{grid-column:1/-1;display:flex;justify-content:space-between;align-items:center;gap:10px}.gpdh h3{margin:0;color:#24396f}
+.gpptab td{padding:6px}.gpptab input{padding:8px;font-size:13px;min-width:120px}
+.gpdlg .actions{justify-content:space-between}
+.warnbox{border:1px solid #f5b5ae;background:#fff1f0;color:#8f2119;border-radius:12px;padding:10px 14px;font-size:12px}
+#gpBody .stat strong{font-size:21px;line-height:1.2;white-space:nowrap}
+#gpBody .stat{min-width:0}#gpBody .stat>span:not(.tile){padding-right:26px}
+.gpsum .grand td{background:#d6245f}
+.gpdlg{overflow-x:hidden}.gpdlg input,.gpdlg select{min-width:0}
+@media(max-width:1250px){#gpBody .stats{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:600px){.hero.gphero h2{font-size:22px}.gpdlg{padding:16px}
+#gpBody .stats{grid-template-columns:1fr}#gpBody .stat{min-height:96px}#gpBody .stat strong{font-size:22px}
+.gpsum{white-space:normal}.gpsum th,.gpsum td{padding:10px 6px}.gpsum th:nth-child(2),.gpsum td:nth-child(2){display:none}
+.gpptab,.gpptab tbody{display:block}.gpptab thead{display:none}
+.gpptab tr{display:grid;grid-template-columns:1fr 1fr auto;gap:6px;padding:8px 0;border-bottom:1px solid var(--line)}
+.gpptab td{padding:0;border:0}.gpptab td:nth-child(3){grid-column:1/-1;grid-row:2}.gpptab input{min-width:0;width:100%}
+.gpptab .pn::placeholder{color:#9aa6bd}}
+@media print{.gptabs,.gpbar,.gpdlg{display:none!important}}
 </style>
 </head>
 <body>
@@ -171,6 +209,7 @@ textarea{width:100%;min-height:80px;border:1px solid #d5ddec;border-radius:11px;
 <button class="nav hidden" data-view="adherents"><span class="ico">👥</span>Adhérents</button>
 <button class="nav hidden" data-view="nouveau"><span class="ico">➕</span>Nouvelle adhésion</button>
 <button class="nav hidden" data-view="archives"><span class="ico">🗄️</span>Archives</button>
+<button class="nav hidden" data-view="gestion"><span class="ico">📒</span>Gestion de projet</button>
 <button class="nav hidden" data-view="projets"><span class="ico">🏗️</span>Projets</button>
 <button class="nav hidden" data-view="utilisateurs"><span class="ico">🔑</span>Agents de saisie</button>
 <div class="sidefoot" id="status">● Hors connexion</div></aside>
@@ -258,7 +297,46 @@ textarea{width:100%;min-height:80px;border:1px solid #d5ddec;border-radius:11px;
 <div class="actions"><button id="usrSave" class="btn primary" type="submit">Créer l'agent</button></div></form>
 <div id="usrMessage" class="message" role="alert"></div>
 <div class="tablewrap"><table><thead><tr><th>Nom</th><th>E-mail</th><th>Rôle</th><th>Statut</th><th class="acts">Action</th></tr></thead><tbody id="usrRows"></tbody></table></div></div></section>
+<section id="gestionView" class="view hidden">
+<div class="hero gphero"><div><span class="pill">GESTION DE PROJET</span><h2>Suivi des acomptes et versements</h2><p>Chaque projet reprend le fonctionnement du logiciel Excel : pages par année, sans date, versements complets et attestations, avec tous les calculs automatiques.</p></div></div>
+<div class="panel"><div class="panelhead"><div><h3>Projets en cours</h3><div class="muted">Cliquez sur un projet pour le gérer.</div></div></div><div id="gpMsg" class="message" role="alert"></div><div id="gpCards" class="pcards"></div></div>
+<div class="panel"><div class="panelhead"><div><h3 id="gpPFTitle">Ajouter un projet</h3><div class="muted">Le prix au m² sert au calcul automatique des attestations (superficie × prix).</div></div></div>
+<form id="gpProjForm" class="formgrid" autocomplete="off">
+<div><label for="gpp_nom">Nom du projet *</label><input id="gpp_nom" required minlength="2" maxlength="80"></div>
+<div><label for="gpp_loc">Localisation</label><input id="gpp_loc" maxlength="120"></div>
+<div><label for="gpp_prix">Prix au m² pour les attestations (FCFA) *</label><input id="gpp_prix" type="number" min="0" step="1" value="50000" required></div>
+<div><label for="gpp_an">Première année de suivi *</label><input id="gpp_an" type="number" min="1990" max="2200" step="1" required></div>
+<div style="grid-column:1/-1"><label for="gpp_desc">Description</label><textarea id="gpp_desc" maxlength="600"></textarea></div>
+<div class="actions"><button class="btn light" type="reset">Annuler</button><button id="gpProjSave" class="btn primary" type="submit">Ajouter le projet</button></div></form>
+<div id="gpPMsg" class="message" role="alert"></div></div>
 </section>
+<section id="gprojetView" class="view hidden">
+<div class="hero gphero"><div><span class="pill" id="gpLoc">PROJET</span><h2 id="gpName"></h2><p id="gpMeta"></p></div></div>
+<div class="toolbar gpbar" style="margin-bottom:16px"><button class="btn light" type="button" data-gpback>← Tous les projets</button><button class="btn light" type="button" data-gprefresh>⟳ Actualiser</button><button class="btn light" type="button" data-gpset>⚙ Paramètres</button><button class="btn danger" type="button" data-gpdelproj>Supprimer le projet</button></div>
+<div id="gpTabs" class="gptabs" role="tablist" aria-label="Pages du projet"></div>
+<div id="gpLMsg" class="message" role="alert"></div>
+<div id="gpBody"></div>
+</section>
+</section>
+<dialog id="gpDlg" class="gpdlg" aria-labelledby="gpDT">
+<form id="gpForm" class="formgrid" autocomplete="off" novalidate>
+<div class="gpdh"><h3 id="gpDT">Fiche</h3><button type="button" class="btn mini light" id="gpClose">✕ Fermer</button></div>
+<div id="gpWarn" class="warnbox hidden" style="grid-column:1/-1"></div>
+<div><label for="g_page">Page *</label><select id="g_page"></select></div>
+<div><label for="g_num">N°</label><input id="g_num" type="number" min="0" step="1" placeholder="Automatique"></div>
+<div><label for="g_pre">Prénom(s) *</label><input id="g_pre" maxlength="80"></div>
+<div><label for="g_nom">Nom *</label><input id="g_nom" maxlength="80"></div>
+<div><label for="g_tel">Téléphone</label><input id="g_tel" maxlength="30" inputmode="tel"></div>
+<div class="gpd"><label for="g_date">Date d’arrivée</label><input id="g_date" type="date" min="1990-01-01" max="2200-12-31"></div>
+<div class="gpv"><label for="g_parc">N° parcelle</label><input id="g_parc" maxlength="30"></div>
+<div class="gpv"><label for="g_sup">Superficie (m²)</label><input id="g_sup" type="number" min="0" step="0.01" inputmode="decimal"></div>
+<div id="gpAttCalc" class="kv" style="grid-column:1/-1"></div>
+<div class="section gppay">Acomptes / versements de cette personne · <span id="gpPayTot"></span></div>
+<div class="gppay" style="grid-column:1/-1"><div class="tablewrap"><table class="gpptab"><thead><tr><th>Date</th><th>Montant (FCFA)</th><th>Note</th><th></th></tr></thead><tbody id="gpPayRows"></tbody></table></div>
+<button type="button" class="btn mini primary" id="gpAddPay" style="margin-top:10px">＋ Ajouter un acompte</button></div>
+<div class="actions"><button type="button" class="btn danger" id="gpDel">Supprimer la personne</button><button type="submit" class="btn primary" id="gpSave">Enregistrer</button></div>
+<div id="gpFMsg" class="message" role="alert" style="grid-column:1/-1"></div>
+</form></dialog>
 <footer id="foot">COHAG — Accès réservé au personnel autorisé<br>Conçu par Gend Julien Dath Yanghane SENE, mle 15302/S</footer>
 </main></div>
 
@@ -279,13 +357,14 @@ const ini=(a,b)=>((a||'?')[0]+(b||'')[0]).toUpperCase();
 const ago=d=>{const m=Math.max(0,Math.round((Date.now()-new Date(d))/60000));return m<60?'Il y a '+m+' min':m<1440?'Il y a '+Math.round(m/60)+' h':'Il y a '+Math.round(m/1440)+' j'};
 const isAdmin=()=>profile?.role==='admin';
 function msg(id,t,cls=''){const e=$(id);e.textContent=t;e.className='message '+cls}
-const VIEWS={dashboard:'Tableau de bord',adherents:'Base des adhérents',nouveau:'Nouvelle adhésion',archives:'Archives',projets:'Projets',projet:'Détail du projet',utilisateurs:'Agents de saisie'};
+const VIEWS={dashboard:'Tableau de bord',adherents:'Base des adhérents',nouveau:'Nouvelle adhésion',archives:'Archives',projets:'Projets',projet:'Détail du projet',utilisateurs:'Agents de saisie',gestion:'Gestion de projet',gprojet:'Gestion de projet'};
 function show(name){
   if(!user||!VIEWS[name]||((name==='projets'||name==='utilisateurs')&&!isAdmin()))return;
   Object.keys(VIEWS).forEach(v=>$(v+'View').classList.toggle('hidden',v!==name));
-  document.querySelectorAll('.nav').forEach(b=>{const on=b.dataset.view===name;b.classList.toggle('active',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
+  document.querySelectorAll('.nav').forEach(b=>{const on=b.dataset.view===name||(name==='gprojet'&&b.dataset.view==='gestion');b.classList.toggle('active',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
   $('pageTitle').textContent=VIEWS[name];
   if(name==='utilisateurs')usrLoad();
+  if(name==='gestion')gpLoadProjets();
 }
 const go=n=>{if(n==='nouveau')resetEdit();show(n)};
 document.querySelectorAll('.nav').forEach(b=>b.onclick=()=>go(b.dataset.view));document.querySelectorAll('[data-goto]').forEach(b=>b.onclick=()=>go(b.dataset.goto));
@@ -524,6 +603,7 @@ function resetUI(text){
   document.querySelectorAll('.nav').forEach(b=>b.classList.add('hidden'));
   $('pageTitle').textContent='Connexion';$('userName').textContent='Accès sécurisé';$('userRole').textContent='';$('avatar').textContent='🔒';$('repart').innerHTML='';$('activ').innerHTML='';$('status').textContent='● Hors connexion';
   $('password').value='';if(text)msg('loginMessage',text);
+  GP.projets=[];GP.cur=null;GP.lignes=[];GP.pay={};GP.q='';GP.pq='';['gpCards','gpTabs','gpBody'].forEach(i=>$(i).innerHTML='');if($('gpDlg').open)$('gpDlg').close();
 }
 async function logout(text){if(client)await client.auth.signOut();resetUI(text)}
 $('logout').onclick=()=>logout('Vous êtes déconnecté.');
@@ -551,6 +631,260 @@ $('usrRows').onclick=async e=>{
   try{await usrCall({action:'set_active',id:b.dataset.uid,active:b.dataset.on==='1'});await usrLoad();msg('usrMessage','Compte mis à jour.','success')}
   catch(err){msg('usrMessage',err.message,'error')}
 };
+
+/* =====================================================================
+   GESTION DE PROJET — reprise du logiciel Excel (pages par année, sans date,
+   versement complet, attestations) avec calculs automatiques.
+   Administrateurs et agents de saisie ont les mêmes droits ici (RLS gp_autorise).
+   ===================================================================== */
+const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',edit:null,projEdit:null,busy:false};
+const gpNorm=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ /g,' ').toLowerCase().replace(/\s+/g,' ').trim();
+const gpNf=x=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2}).format(Number(x)||0);
+const gpP=()=>GP.projets.find(p=>p.id===GP.cur);
+const gpKey=l=>l.page==='acompte'?'y'+l.annee:l.page;
+const gpLabel=k=>k[0]==='y'?'Année '+k.slice(1):({sans_date:'Sans date',versement:'Versement complet',attestation:'Attestations'})[k]||k;
+const gpIsAcompte=k=>k[0]==='y'||k==='sans_date';
+/* Montant d'une ligne : somme de ses acomptes ; attestation = superficie × prix au m² (comme =H8*50000 dans Excel) */
+const gpMt=l=>l.page==='attestation'?Math.round((Number(l.superficie)||0)*(Number(gpP()?.prix_m2)||0)):(GP.pay[l.id]||[]).reduce((s,x)=>s+Number(x.montant||0),0);
+const gpYears=()=>[...new Set([...(gpP()?.annees||[]),...GP.lignes.filter(l=>l.page==='acompte').map(l=>l.annee)])].sort((a,b)=>a-b);
+const gpKeys=()=>[...gpYears().map(y=>'y'+y),'sans_date','versement','attestation'];
+const gpOf=k=>GP.lignes.filter(l=>gpKey(l)===k).sort((a,b)=>(a.numero??1e9)-(b.numero??1e9)||a.prenom.localeCompare(b.prenom,'fr'));
+/* Équivalents de =SUM(G8:G164) et =COUNTIF(G8:G164,">0") */
+const gpSum=k=>{const a=gpOf(k).map(gpMt);return{n:a.filter(v=>v>0).length,t:a.reduce((s,v)=>s+v,0),c:a.length}};
+const gpBad=l=>l.page==='acompte'&&(!!l.date_texte||(!!l.date_arrivee&&Number(l.date_arrivee.slice(0,4))!==l.annee));
+const gpDate=l=>l.date_arrivee?new Date(l.date_arrivee+'T00:00:00').toLocaleDateString('fr-FR'):l.date_texte?l.date_texte:(l.page==='sans_date'?'PAS DE DATE':'—');
+const gpErr=(e,t)=>{console.error('gestion',e);return t+' (code '+(e&&e.code||'?')+')'};
+
+/* Lecture paginée (Supabase renvoie 1000 lignes maximum par requête) */
+async function gpAll(table,cols,id){let out=[];for(let i=0;;i+=1000){const {data,error}=await client.from(table).select(cols).eq('projet_id',id).order('id').range(i,i+999);if(error)throw error;out=out.concat(data||[]);if(!data||data.length<1000)break}return out}
+
+async function gpFetchProjets(){
+  const {data,error}=await client.from('gp_projets').select('id,nom,localisation,description,prix_m2,annees').order('nom');
+  if(error)throw error;GP.projets=data||[];
+}
+async function gpLoadProjets(){
+  if(!user)return;
+  if(!GP.projEdit)$('gpp_an').value=new Date().getFullYear();
+  try{await gpFetchProjets()}catch(e){msg('gpMsg',gpErr(e,'Chargement impossible. Vérifiez que le script SQL « Gestion de projet » a bien été exécuté dans Supabase.'),'error');return}
+  if($('gpMsg').classList.contains('error'))msg('gpMsg','');
+  const counts=await Promise.all(GP.projets.map(p=>client.from('gp_lignes').select('id',{count:'exact',head:true}).eq('projet_id',p.id).then(r=>r.count||0,()=>0)));
+  $('gpCards').innerHTML=GP.projets.map((p,i)=>`<button class="pcard" type="button" data-gpopen="${esc(p.id)}"><span class="badge">En gestion</span><b>${esc(p.nom)}</b><small>${esc(p.localisation||'Localisation non précisée')}</small><small>${counts[i]} personne${counts[i]>1?'s':''} enregistrée${counts[i]>1?'s':''}</small><small>Années suivies : ${esc((p.annees||[]).join(', ')||'—')}</small></button>`).join('')||'<div class="empty">Aucun projet pour le moment. Ajoutez le premier avec le formulaire ci-dessous.</div>';
+}
+$('gpCards').onclick=e=>{const c=e.target.closest('[data-gpopen]');if(c)gpOpen(c.dataset.gpopen)};
+
+$('gpProjForm').onsubmit=async e=>{
+  e.preventDefault();if(!user||!$('gpProjForm').reportValidity())return;
+  const nom=$('gpp_nom').value.trim(),prix=Number($('gpp_prix').value),an=Number($('gpp_an').value);
+  if(nom.length<2||!Number.isInteger(prix)||prix<0){msg('gpPMsg','Vérifiez le nom et le prix au m².','error');return}
+  const rec={nom,localisation:$('gpp_loc').value.trim()||null,description:$('gpp_desc').value.trim()||null,prix_m2:prix};
+  if(!GP.projEdit){if(!Number.isInteger(an)||an<1990||an>2200){msg('gpPMsg','Année invalide.','error');return}rec.annees=[an]}
+  $('gpProjSave').disabled=true;msg('gpPMsg','Enregistrement…');
+  const t=client.from('gp_projets'),{data,error}=await (GP.projEdit?t.update(rec).eq('id',GP.projEdit):t.insert(rec)).select('id');
+  $('gpProjSave').disabled=false;
+  if(error||!data||!data.length){msg('gpPMsg',error&&error.code==='23505'?'Un projet porte déjà ce nom.':gpErr(error,'Enregistrement impossible.'),'error');return}
+  const wasEdit=GP.projEdit;$('gpProjForm').reset();
+  if(wasEdit){await gpOpen(wasEdit);msg('gpLMsg','Paramètres du projet enregistrés.','success')}
+  else{await gpLoadProjets();msg('gpPMsg','Projet ajouté. Cliquez dessus pour commencer la saisie.','success')}
+};
+$('gpProjForm').addEventListener('reset',()=>{GP.projEdit=null;$('gpProjSave').textContent='Ajouter le projet';$('gpPFTitle').textContent='Ajouter un projet';$('gpp_an').disabled=false;setTimeout(()=>{$('gpp_prix').value=50000;$('gpp_an').value=new Date().getFullYear()})});
+
+async function gpOpen(id){GP.cur=id;GP.tab='home';GP.q='';GP.pq='';show('gprojet');await gpLoad()}
+async function gpLoad(){
+  if(!user||!GP.cur)return;
+  msg('gpLMsg','Chargement…');
+  try{
+    await gpFetchProjets();if(!gpP()){show('gestion');return}
+    const [lg,pm]=await Promise.all([gpAll('gp_lignes','id,page,annee,numero,prenom,nom,telephone,date_arrivee,date_texte,n_parcelle,superficie',GP.cur),gpAll('gp_paiements','id,ligne_id,montant,date_paiement,note,created_at',GP.cur)]);
+    GP.lignes=lg;GP.pay={};
+    pm.sort((a,b)=>String(a.date_paiement||'9999').localeCompare(String(b.date_paiement||'9999'))||String(a.created_at).localeCompare(String(b.created_at))).forEach(x=>(GP.pay[x.ligne_id]=GP.pay[x.ligne_id]||[]).push(x));
+    msg('gpLMsg','');
+  }catch(e){msg('gpLMsg',gpErr(e,'Chargement impossible. Vérifiez votre connexion puis cliquez sur « Actualiser ».'),'error')}
+  gpRender();
+}
+
+function gpRender(){
+  const p=gpP();if(!p)return;
+  $('gpName').textContent=p.nom;$('gpLoc').textContent=(p.localisation||'PROJET').toUpperCase();
+  $('gpMeta').textContent=GP.lignes.length+' personnes enregistrées · Attestation : superficie × '+gpNf(p.prix_m2)+' F le m²';
+  const keys=gpKeys();if(GP.tab!=='home'&&!keys.includes(GP.tab))GP.tab='home';
+  $('gpTabs').innerHTML=`<button class="gptab ${GP.tab==='home'?'on':''}" type="button" role="tab" aria-selected="${GP.tab==='home'}" data-tab="home">🏠 Accueil</button>`+keys.map(k=>`<button class="gptab ${GP.tab===k?'on':''}" type="button" role="tab" aria-selected="${GP.tab===k}" data-tab="${k}">${esc(gpLabel(k))}</button>`).join('')+`<button class="gptab add" type="button" data-addyear>＋ Année</button>`;
+  GP.tab==='home'?gpHome():gpPage(GP.tab);
+}
+
+function gpHome(){
+  const keys=gpKeys(),S={};keys.forEach(k=>S[k]=gpSum(k));
+  const ac=keys.filter(gpIsAcompte),totAc=ac.reduce((s,k)=>s+S[k].t,0),nAc=ac.reduce((s,k)=>s+S[k].n,0),totAll=totAc+S.versement.t;
+  const bad=GP.lignes.filter(gpBad);
+  const card=(ico,l,v,sm,tab)=>`<div class="stat"><span class="tile">${ico}</span><span>${l}</span><strong>${v}</strong><small>${sm}</small>${tab?`<button class="go" type="button" data-tab="${tab}" aria-label="Ouvrir">→</button>`:''}</div>`;
+  $('gpBody').innerHTML=`<div class="stats">${card('💰','Total acompte et versement',money(totAll),'Acomptes + versements complets')}${card('🧾','Total acompte',money(totAc),nAc+' acompte'+(nAc>1?'s':'')+' au total')}${card('🏁','Versement complet',money(S.versement.t),S.versement.n+' versement'+(S.versement.n>1?'s':''),'versement')}${card('📜','Attestations',money(S.attestation.t),S.attestation.n+' attestation'+(S.attestation.n>1?'s':'')+' · hors total','attestation')}</div>
+<div class="panel"><div class="panelhead"><div><h3>🔎 Rechercher un membre</h3><div class="muted">Par prénom, nom ou téléphone, dans toutes les pages. Les accents et majuscules sont ignorés ; « Abdou » trouve « Abdou Aziz » mais pas « Abdoulaye ».</div></div><button class="btn primary" type="button" data-gpadd>＋ Ajouter une personne</button></div>
+<input id="gpQ" type="search" maxlength="60" placeholder="Ex. : Moussa, DIAGNE, Moussa Diagne, 77 405…" aria-label="Rechercher un membre" value="${esc(GP.q)}"><ul id="gpRes" class="gpres"></ul></div>
+<div class="dgrid"><div class="panel"><div class="panelhead"><div><h3>Tableau de suivi acompte et versement</h3><div class="muted">Nombre (montant supérieur à 0) et total par page. Cliquez sur une ligne pour l’ouvrir.</div></div><button class="btn light" type="button" data-gpcsv="all">Exporter tout (CSV)</button></div>
+<div class="tablewrap"><table class="gpsum"><thead><tr><th>Page</th><th class="num">Personnes</th><th class="num">Nombre</th><th class="num">Total</th></tr></thead><tbody>
+${ac.map(k=>`<tr data-tab="${k}"><td><b>${esc(k[0]==='y'?'Acompte '+k.slice(1):'Acompte sans date')}</b></td><td class="num">${S[k].c}</td><td class="num">${S[k].n}</td><td class="num">${money(S[k].t)}</td></tr>`).join('')}
+<tr class="tot" data-tab="home"><td>TOTAL ACOMPTE</td><td class="num">${ac.reduce((s,k)=>s+S[k].c,0)}</td><td class="num">${nAc}</td><td class="num">${money(totAc)}</td></tr>
+<tr data-tab="versement"><td><b>Versement complet</b></td><td class="num">${S.versement.c}</td><td class="num">${S.versement.n}</td><td class="num">${money(S.versement.t)}</td></tr>
+<tr class="grand" data-tab="home"><td>TOTAL ACOMPTE ET VERSEMENT</td><td class="num"></td><td class="num">${nAc+S.versement.n}</td><td class="num">${money(totAll)}</td></tr>
+<tr data-tab="attestation"><td><b>Attestations</b> <small class="muted">(hors total)</small></td><td class="num">${S.attestation.c}</td><td class="num">${S.attestation.n}</td><td class="num">${money(S.attestation.t)}</td></tr>
+</tbody></table></div></div>
+<div class="col2"><div class="panel"><h3>⚠️ À vérifier</h3><div class="muted">Dates illisibles ou d’une autre année que leur page.</div><ul class="gpres">${bad.map(l=>`<li><button type="button" data-ligne="${esc(l.id)}"><span><b>${esc(l.prenom)} ${esc(l.nom)}</b><small>${esc(gpLabel(gpKey(l)))} · N° ${esc(l.numero??'—')}</small></span><span class="tag">${esc(gpDate(l))}</span></button></li>`).join('')||'<li class="muted">Aucune anomalie. ✅</li>'}</ul></div></div></div>`;
+  $('gpQ').oninput=e=>{GP.q=e.target.value;gpSearch()};gpSearch();
+}
+/* Recherche : chaque mot saisi doit être un mot entier du prénom ou du nom (règle de la macro Excel),
+   ou bien les chiffres saisis doivent figurer dans le téléphone. */
+function gpMatch(l,q){
+  const words=gpNorm(q).split(' ').filter(Boolean);if(!words.length)return false;
+  const hay=(gpNorm(l.prenom)+' '+gpNorm(l.nom)).split(' ');
+  if(words.every(w=>hay.includes(w)))return true;
+  const d=q.replace(/\D/g,'');return d.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(d);
+}
+function gpSearch(){
+  const el=$('gpRes');if(!el)return;const q=GP.q.trim();
+  if(!q){el.innerHTML='';return}
+  const r=GP.lignes.filter(l=>gpMatch(l,q));const keys=gpKeys();
+  r.sort((a,b)=>keys.indexOf(gpKey(a))-keys.indexOf(gpKey(b))||(a.numero??0)-(b.numero??0));
+  el.innerHTML=`<li class="muted">${r.length} résultat${r.length>1?'s':''}</li>`+r.map(l=>`<li><button type="button" data-ligne="${esc(l.id)}"><span><b>${esc(l.prenom)} ${esc(l.nom)}</b><small>${esc(l.telephone||'—')} · ${esc(l.page==='attestation'?'Attestation reçue':gpDate(l))}</small></span><span style="text-align:right"><span class="tag">${esc(gpLabel(gpKey(l)))} · N° ${esc(l.numero??'—')}</span><small>${money(gpMt(l))}</small></span></button></li>`).join('');
+}
+
+function gpPage(k){
+  const vers=k==='versement'||k==='attestation',lab=k==='versement'||k==='attestation'?'Versement':'Acompte',s=gpSum(k);
+  $('gpBody').innerHTML=`<div class="panel"><div class="panelhead"><div><h3>${esc(gpLabel(k))}</h3><div class="muted">${s.c} personne${s.c>1?'s':''} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''} · Total ${money(s.t)}${k==='attestation'?' · Versement = superficie × '+gpNf(gpP().prix_m2)+' F':''}</div></div>
+<div class="toolbar gpbar"><button class="btn primary" type="button" data-gpadd>＋ Ajouter une personne</button><button class="btn light" type="button" data-gpcsv="${k}">Exporter CSV</button><button class="btn light" type="button" data-gpprint>Imprimer</button></div></div>
+<div class="searchrow gpbar"><input id="gpPq" type="search" maxlength="60" placeholder="Filtrer cette page (prénom, nom, téléphone)…" aria-label="Filtrer cette page" value="${esc(GP.pq)}"></div>
+<div class="tablewrap"><table><thead><tr><th>N°</th><th>Prénoms</th><th>Noms</th><th>Téléphone</th>${vers?'<th>N° parcelle</th><th class="num">Versement</th><th class="num">Superficie</th>':'<th>Date d’arrivée</th><th class="num">Acompte</th><th class="num">Nb</th>'}</tr></thead><tbody id="gpRows"></tbody>
+<tfoot><tr><td colspan="5">TOTAL ${k==='attestation'?'ATTESTATIONS':k==='versement'?'VERSEMENT COMPLET':'ACOMPTE'} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''}</td><td class="num">${money(s.t)}</td><td></td></tr></tfoot></table></div></div>`;
+  $('gpPq').oninput=e=>{GP.pq=e.target.value;gpRows(k)};gpRows(k);
+}
+function gpRows(k){
+  const vers=k==='versement'||k==='attestation',q=gpNorm(GP.pq),qd=GP.pq.replace(/\D/g,'');
+  const arr=gpOf(k).filter(l=>!q||gpNorm(l.prenom+' '+l.nom).includes(q)||(qd.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(qd)));
+  $('gpRows').innerHTML=arr.map(l=>{const m=gpMt(l),np=(GP.pay[l.id]||[]).length;return `<tr class="${gpBad(l)?'bad':''}"><td>${esc(l.numero??'')}</td><td><button class="lnk" type="button" data-ligne="${esc(l.id)}">${esc(l.prenom)||'—'}</button></td><td>${esc(l.nom)}</td><td>${esc(l.telephone||'')}</td>${vers?`<td>${esc(l.n_parcelle||'')}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${l.superficie!=null?gpNf(l.superficie):''}</td>`:`<td class="dt">${esc(gpDate(l))}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${np>1?np:''}</td>`}</tr>`}).join('')||'<tr><td colspan="7" class="empty">Aucune personne sur cette page.</td></tr>';
+}
+
+/* ---------- Fiche d'une personne + historique des acomptes ---------- */
+function gpPageOptions(sel){$('g_page').innerHTML=gpKeys().map(k=>`<option value="${k}">${esc(gpLabel(k))}</option>`).join('');$('g_page').value=sel}
+function gpToggle(){
+  const k=$('g_page').value,isV=k==='versement'||k==='attestation',isA=k==='attestation';
+  document.querySelectorAll('#gpForm .gpd').forEach(x=>x.classList.toggle('hidden',isV));
+  document.querySelectorAll('#gpForm .gpv').forEach(x=>x.classList.toggle('hidden',!isV));
+  document.querySelectorAll('#gpForm .gppay').forEach(x=>x.classList.toggle('hidden',isA));
+  $('gpAttCalc').classList.toggle('hidden',!isA);gpCalc();
+}
+function gpPayRow(x){return `<tr data-pid="${esc(x?.id||'')}"><td><input type="date" class="pd" value="${esc(x?.date_paiement||'')}" min="1990-01-01" max="2200-12-31" aria-label="Date"></td><td><input type="number" class="pm" min="1" step="1" inputmode="numeric" value="${esc(x?.montant??'')}" aria-label="Montant"></td><td><input class="pn" maxlength="200" value="${esc(x?.note||'')}" aria-label="Note" placeholder="Note (facultatif)"></td><td><button type="button" class="btn mini danger" data-delpay aria-label="Retirer cet acompte">✕</button></td></tr>`}
+function gpCalc(){
+  const t=[...$('gpPayRows').querySelectorAll('.pm')].reduce((s,i)=>s+(Number(i.value)||0),0);
+  $('gpPayTot').textContent='Total : '+money(t);
+  const sup=Number($('g_sup').value)||0,pr=Number(gpP()?.prix_m2)||0;
+  $('gpAttCalc').innerHTML=`<small>Versement calculé automatiquement</small><b>${gpNf(sup)} m² × ${gpNf(pr)} F = ${money(Math.round(sup*pr))}</b>`;
+}
+function gpFiche(id){
+  const l=id?GP.lignes.find(x=>x.id===id):null;if(id&&!l)return;
+  GP.edit=l?l.id:null;
+  const k=l?gpKey(l):(GP.tab!=='home'?GP.tab:'y'+(gpYears().includes(new Date().getFullYear())?new Date().getFullYear():gpYears().slice(-1)[0]||new Date().getFullYear()));
+  gpPageOptions(k);
+  $('gpDT').textContent=l?(l.prenom+' '+l.nom).trim()||'Fiche':'Nouvelle personne';
+  $('g_num').value=l?.numero??'';$('g_pre').value=l?.prenom||'';$('g_nom').value=l?.nom||'';$('g_tel').value=l?.telephone||'';
+  $('g_date').value=l?.date_arrivee||'';$('g_parc').value=l?.n_parcelle||'';$('g_sup').value=l?.superficie??'';
+  $('gpPayRows').innerHTML=(l?(GP.pay[l.id]||[]):[]).map(gpPayRow).join('');
+  if(!l||!(GP.pay[l.id]||[]).length)$('gpPayRows').insertAdjacentHTML('beforeend',gpPayRow(null));
+  const w=[];if(l?.date_texte)w.push('Date saisie dans Excel : « '+l.date_texte+' » (date invalide). Choisissez la bonne date ci-dessous puis enregistrez.');
+  if(l&&l.page==='acompte'&&l.date_arrivee&&Number(l.date_arrivee.slice(0,4))!==l.annee)w.push('La date d’arrivée ('+gpDate(l)+') n’est pas de l’année '+l.annee+'. Corrigez la date ou changez la page.');
+  $('gpWarn').textContent=w.join(' ');$('gpWarn').classList.toggle('hidden',!w.length);
+  $('gpDel').classList.toggle('hidden',!l);msg('gpFMsg','');gpToggle();
+  $('gpDlg').showModal();
+}
+$('gpAddPay').onclick=()=>{$('gpPayRows').insertAdjacentHTML('beforeend',gpPayRow(null));$('gpPayRows').lastElementChild.querySelector('.pm').focus();gpCalc()};
+$('gpPayRows').onclick=e=>{const b=e.target.closest('[data-delpay]');if(b){b.closest('tr').remove();gpCalc()}};
+$('gpPayRows').oninput=gpCalc;$('g_sup').oninput=gpCalc;$('g_page').onchange=gpToggle;
+$('gpClose').onclick=()=>$('gpDlg').close();
+
+$('gpForm').onsubmit=async e=>{
+  e.preventDefault();if(!user||GP.busy)return;
+  const k=$('g_page').value,page=k[0]==='y'?'acompte':k,annee=k[0]==='y'?Number(k.slice(1)):null;
+  const pre=$('g_pre').value.trim(),nom=$('g_nom').value.trim();
+  if(!pre&&!nom){msg('gpFMsg','Saisissez au moins le prénom ou le nom.','error');return}
+  const numS=$('g_num').value.trim(),supS=$('g_sup').value.trim(),d=$('g_date').value||null;
+  if(numS!==''&&(!Number.isInteger(Number(numS))||Number(numS)<0)){msg('gpFMsg','N° invalide.','error');return}
+  if(supS!==''&&!(Number(supS)>=0)){msg('gpFMsg','Superficie invalide.','error');return}
+  if(d&&(d<'1990-01-01'||d>'2200-12-31')){msg('gpFMsg','Date d’arrivée invalide.','error');return}
+  /* Acomptes saisis */
+  const pays=[];
+  for(const tr of $('gpPayRows').querySelectorAll('tr')){
+    const ms=tr.querySelector('.pm').value.trim(),pd=tr.querySelector('.pd').value||null,pn=tr.querySelector('.pn').value.trim()||null;
+    if(ms===''&&!pd&&!pn)continue;
+    const m=Number(ms);if(!Number.isInteger(m)||m<=0){msg('gpFMsg','Chaque acompte doit avoir un montant entier supérieur à 0.','error');tr.querySelector('.pm').focus();return}
+    pays.push({id:tr.dataset.pid||null,montant:m,date_paiement:pd,note:pn});
+  }
+  const old=GP.edit?GP.lignes.find(x=>x.id===GP.edit):null;
+  let numero=numS===''||(old&&gpKey(old)!==k&&numS===String(old.numero??''))?null:Number(numS);
+  if(numero===null&&(!old||gpKey(old)!==k))numero=gpOf(k).reduce((m,x)=>Math.max(m,x.numero||0),0)+1;
+  else if(numero===null)numero=old.numero;
+  const rec={page,annee,numero,prenom:pre,nom,telephone:$('g_tel').value.trim()||null,date_arrivee:d,date_texte:(d||!gpIsAcompte(k))?null:(old?.date_texte||null),n_parcelle:$('g_parc').value.trim()||null,superficie:supS===''?null:Number(supS)};
+  GP.busy=true;$('gpSave').disabled=true;msg('gpFMsg','Enregistrement…');
+  try{
+    let id=GP.edit;
+    const t=client.from('gp_lignes');
+    const {data,error}=await (id?t.update(rec).eq('id',id):t.insert({...rec,projet_id:GP.cur})).select('id');
+    if(error||!data||!data.length)throw error||{code:'droits'};
+    id=data[0].id;
+    if(page!=='attestation'){
+      const before=GP.pay[id]||[],keep=new Set(pays.filter(p=>p.id).map(p=>p.id));
+      const del=before.filter(x=>!keep.has(x.id)).map(x=>x.id);
+      if(del.length){const r=await client.from('gp_paiements').delete().in('id',del);if(r.error)throw r.error}
+      for(const p of pays.filter(p=>p.id)){const o=before.find(x=>x.id===p.id);if(o&&(Number(o.montant)!==p.montant||(o.date_paiement||null)!==p.date_paiement||(o.note||null)!==p.note)){const r=await client.from('gp_paiements').update({montant:p.montant,date_paiement:p.date_paiement,note:p.note}).eq('id',p.id);if(r.error)throw r.error}}
+      const ins=pays.filter(p=>!p.id).map(p=>({ligne_id:id,projet_id:GP.cur,montant:p.montant,date_paiement:p.date_paiement,note:p.note}));
+      if(ins.length){const r=await client.from('gp_paiements').insert(ins);if(r.error)throw r.error}
+    }
+    $('gpDlg').close();
+    if(GP.tab!=='home')GP.tab=k;
+    await gpLoad();msg('gpLMsg',(old?'Fiche de ':'Ajout de ')+(pre+' '+nom).trim()+' enregistré.','success');
+  }catch(err){msg('gpFMsg',gpErr(err,'Enregistrement impossible. Vérifiez votre connexion et réessayez.'),'error')}
+  finally{GP.busy=false;$('gpSave').disabled=false}
+};
+$('gpDel').onclick=async()=>{
+  const l=GP.lignes.find(x=>x.id===GP.edit);if(!l||!user)return;
+  if(!confirm('Supprimer définitivement '+(l.prenom+' '+l.nom).trim()+' de la page « '+gpLabel(gpKey(l))+' » ?\nSes acomptes enregistrés seront aussi supprimés.'))return;
+  const {data,error}=await client.from('gp_lignes').delete().eq('id',l.id).select('id');
+  if(error||!data||!data.length){msg('gpFMsg',gpErr(error,'Suppression impossible.'),'error');return}
+  $('gpDlg').close();await gpLoad();msg('gpLMsg','Personne supprimée.','success');
+};
+
+/* ---------- Actions de la page projet ---------- */
+function gpCsv(k){
+  const keys=k==='all'?gpKeys():[k],p=gpP();
+  const h=['Page','N°','Prénoms','Noms','Téléphone','Date d’arrivée','N° parcelle','Superficie','Montant FCFA','Nombre d’acomptes'];
+  const rows=keys.flatMap(x=>gpOf(x).map(l=>[gpLabel(x),l.numero??'',l.prenom,l.nom,l.telephone||'',l.page==='versement'||l.page==='attestation'?'':gpDate(l),l.n_parcelle||'',l.superficie??'',gpMt(l),l.page==='attestation'?'':(GP.pay[l.id]||[]).length]));
+  const csv='﻿'+[h,...rows].map(r=>r.map(csvCell).join(';')).join('\r\n');
+  const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
+  const a=document.createElement('a');a.href=u;a.download=('Gestion_'+p.nom+'_'+(k==='all'?'complet':gpLabel(k))+'_'+new Date().toISOString().slice(0,10)).replace(/[^\w.-]+/g,'_')+'.csv';a.click();
+  setTimeout(()=>URL.revokeObjectURL(u),1000);
+}
+$('gprojetView').addEventListener('click',async e=>{
+  const t=e.target.closest('button,tr[data-tab]');if(!t||!user)return;
+  if(t.dataset.tab){if(t.dataset.tab!==GP.tab){GP.tab=t.dataset.tab;GP.pq='';msg('gpLMsg','');gpRender();window.scrollTo({top:0})}return}
+  if(t.dataset.ligne)return gpFiche(t.dataset.ligne);
+  if('gpadd' in t.dataset)return gpFiche(null);
+  if(t.dataset.gpcsv)return gpCsv(t.dataset.gpcsv);
+  if('gpprint' in t.dataset)return window.print();
+  if('gpback' in t.dataset)return show('gestion');
+  if('gprefresh' in t.dataset)return gpLoad();
+  if('gpset' in t.dataset){const p=gpP();show('gestion');GP.projEdit=p.id;$('gpp_nom').value=p.nom;$('gpp_loc').value=p.localisation||'';$('gpp_prix').value=p.prix_m2;$('gpp_desc').value=p.description||'';$('gpp_an').value=(p.annees||[])[0]||'';$('gpp_an').disabled=true;$('gpProjSave').textContent='Enregistrer les paramètres';$('gpPFTitle').textContent='Paramètres de « '+p.nom+' »';msg('gpPMsg','');$('gpp_nom').focus();return}
+  if('addyear' in t.dataset){
+    const ys=gpYears(),def=(ys.slice(-1)[0]||new Date().getFullYear()-1)+1,v=prompt('Quelle année ajouter ?',def);if(v===null)return;
+    const y=Number(v);if(!Number.isInteger(y)||y<1990||y>2200){msg('gpLMsg','Année invalide.','error');return}
+    if(ys.includes(y)){GP.tab='y'+y;gpRender();return}
+    const p=gpP(),{data,error}=await client.from('gp_projets').update({annees:[...new Set([...(p.annees||[]),y])].sort((a,b)=>a-b)}).eq('id',p.id).select('id');
+    if(error||!data||!data.length){msg('gpLMsg',gpErr(error,'Ajout de l’année impossible.'),'error');return}
+    GP.tab='y'+y;await gpLoad();msg('gpLMsg','Page « Année '+y+' » ajoutée.','success');return;
+  }
+  if('gpdelproj' in t.dataset){
+    const p=gpP(),v=prompt('ATTENTION : toutes les personnes et tous les acomptes du projet seront supprimés définitivement.\nPour confirmer, tapez le nom du projet : '+p.nom);if(v===null)return;
+    if(v.trim()!==p.nom){msg('gpLMsg','Nom incorrect : suppression annulée.','error');return}
+    const {data,error}=await client.from('gp_projets').delete().eq('id',p.id).select('id');
+    if(error||!data||!data.length){msg('gpLMsg',gpErr(error,'Suppression impossible.'),'error');return}
+    GP.cur=null;show('gestion');msg('gpMsg','Projet supprimé.','success');
+  }
+});
 
 if(initSupabase()){
   client.auth.getSession().then(({data})=>{if(data.session?.user)openApp(data.session.user)});
