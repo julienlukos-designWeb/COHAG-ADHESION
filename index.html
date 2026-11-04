@@ -216,6 +216,10 @@ tfoot td{font-weight:800;color:#14285f;background:#f4f7ff;border-top:2px solid #
 @media(max-width:900px){.loginwrap{grid-template-columns:minmax(0,440px)}.promo img{max-height:300px;object-position:50% 14%}}
 @media(max-width:600px){.brand .logo{width:92px;padding:4px 6px;border-radius:10px;box-shadow:none}.brand{padding:0 6px 0 2px}
 .dhero{padding:24px 20px}.dhero>div{max-width:100%}.dhero .heroimg{width:100%}.dhero:before{background:linear-gradient(90deg,#0f2a8fee,#1e46cfb3)}.promo img{max-height:240px}}
+/* ===== Tri des années + renommer un agent ===== */
+#gpSort{width:auto;max-width:100%;flex:0 1 330px;font-weight:600}
+.renbtn{margin-left:8px;font-size:12px;font-weight:600;color:#2746c7}
+.renform{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.renform input{width:190px;margin:0}
 /* ===== Droits des agents ===== */
 .perm{display:grid;gap:6px;white-space:normal;min-width:260px}
 .perm div{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
@@ -660,8 +664,11 @@ function permBox(u,perms){
 async function usrLoad(){
   try{const d=await usrCall({action:'list'});
     const perms={};
-    {const {data:pr,error:pe}=await client.rpc('cohag_agents_permissions');if(pe){console.error('droits',pe);msg('usrMessage','Droits indisponibles : exécutez d’abord le script « cohag_droits_agents.sql » dans Supabase. (code '+(pe.code||'?')+')','error')}(pr||[]).forEach(r=>perms[r.id]=r.permissions||{})}
-    $('usrRows').innerHTML=d.users.map(u=>`<tr><td><b>${esc(u.full_name||'—')}</b></td><td>${esc(u.email)}</td><td>${u.role==='admin'?'Administrateur':'Agent de saisie'}</td><td>${u.is_active?'Actif':'Désactivé'}</td><td>${permBox(u,perms)}</td><td class="acts">${u.role==='admin'||u.id===user.id?'—':`<button class="btn mini ${u.is_active?'danger':'primary'}" type="button" data-uid="${esc(u.id)}" data-on="${u.is_active?0:1}">${u.is_active?'Désactiver':'Réactiver'}</button>`}</td></tr>`).join('')}
+    {const {data:pr,error:pe}=await client.rpc('cohag_agents_permissions');if(pe){console.error('droits',pe);msg('usrMessage','Droits indisponibles : exécutez d’abord le script « cohag_droits_agents.sql » dans Supabase. (code '+(pe.code||'?')+')','error')}
+     /* Le nom affiché est celui enregistré dans la plateforme (modifiable) */
+     (pr||[]).forEach(r=>{perms[r.id]=r.permissions||{};const u=d.users.find(x=>x.id===r.id);if(u&&r.full_name)u.full_name=r.full_name})}
+    window.__usrs=d.users;
+    $('usrRows').innerHTML=d.users.map(u=>`<tr><td data-namecell="${esc(u.id)}"><b>${esc(u.full_name||'—')}</b><button class="lnk renbtn" type="button" data-ren="${esc(u.id)}" title="Modifier le nom">✏️ Modifier</button></td><td>${esc(u.email)}</td><td>${u.role==='admin'?'Administrateur':'Agent de saisie'}</td><td>${u.is_active?'Actif':'Désactivé'}</td><td>${permBox(u,perms)}</td><td class="acts">${u.role==='admin'||u.id===user.id?'—':`<button class="btn mini ${u.is_active?'danger':'primary'}" type="button" data-uid="${esc(u.id)}" data-on="${u.is_active?0:1}">${u.is_active?'Désactiver':'Réactiver'}</button>`}</td></tr>`).join('')}
   catch(e){msg('usrMessage',e.message,'error')}
 }
 $('usrRows').addEventListener('change',async e=>{
@@ -674,6 +681,17 @@ $('usrRows').addEventListener('change',async e=>{
   if(error){c.checked=!c.checked;console.error('droits',error);msg('usrMessage','Droits non enregistrés. (code '+(error.code||'?')+')','error');return}
   msg('usrMessage','Droits enregistrés : ils s’appliquent immédiatement.','success');
 });
+$('usrRows').addEventListener('submit',async e=>{
+  const f=e.target.closest('form[data-renform]');if(!f)return;e.preventDefault();if(!user||!isAdmin())return;
+  const nom=f.querySelector('input').value.trim().replace(/\s+/g,' ');
+  if(nom.length<2){msg('usrMessage','Le nom doit contenir au moins 2 caractères.','error');return}
+  f.querySelectorAll('input,button').forEach(x=>x.disabled=true);msg('usrMessage','Enregistrement du nom…');
+  const {error}=await client.rpc('cohag_renommer_agent',{p_agent:f.dataset.renform,p_nom:nom});
+  if(error){console.error('renommer',error);f.querySelectorAll('input,button').forEach(x=>x.disabled=false);
+    msg('usrMessage',error.code==='PGRST202'?'Exécutez d’abord le script « cohag_renommer_agents.sql » dans Supabase.':'Nom non enregistré. (code '+(error.code||'?')+')','error');return}
+  if(f.dataset.renform===user.id){profile.full_name=nom;if($('userName'))$('userName').textContent=nom}
+  await usrLoad();msg('usrMessage','Nom modifié.','success');
+});
 $('usrForm').onsubmit=async e=>{
   e.preventDefault();if(!user||!isAdmin())return;
   $('usrSave').disabled=true;msg('usrMessage','Création du compte…');
@@ -683,7 +701,13 @@ $('usrForm').onsubmit=async e=>{
   $('usrSave').disabled=false;
 };
 $('usrRows').onclick=async e=>{
-  const b=e.target.closest('button[data-uid]');if(!b||!user||!isAdmin())return;
+  if(!user||!isAdmin())return;
+  const rb=e.target.closest('button[data-ren]');
+  if(rb){const id=rb.dataset.ren,u=(window.__usrs||[]).find(x=>x.id===id),td=rb.closest('td');
+    td.innerHTML=`<form class="renform" data-renform="${esc(id)}"><input maxlength="80" minlength="2" required aria-label="Nouveau nom" value="${esc(u?.full_name||'')}"><button class="btn mini primary" type="submit">Enregistrer</button><button class="btn mini light" type="button" data-rencancel>Annuler</button></form>`;
+    const i=td.querySelector('input');i.focus();i.select();return}
+  if(e.target.closest('[data-rencancel]'))return usrLoad();
+  const b=e.target.closest('button[data-uid]');if(!b)return;
   if(!confirm(b.dataset.on==='1'?'Réactiver ce compte ?':'Désactiver ce compte ? L’agent ne pourra plus se connecter.'))return;
   try{await usrCall({action:'set_active',id:b.dataset.uid,active:b.dataset.on==='1'});await usrLoad();msg('usrMessage','Compte mis à jour.','success')}
   catch(err){msg('usrMessage',err.message,'error')}
@@ -694,7 +718,10 @@ $('usrRows').onclick=async e=>{
    versement complet, attestations) avec calculs automatiques.
    Les agents n'agissent ici que selon leurs droits gp_ajouter / gp_modifier / gp_supprimer.
    ===================================================================== */
-const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',edit:null,projEdit:null,busy:false};
+const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',sort:'date',edit:null,projEdit:null,busy:false};
+/* Pages des années : tri par ordre d'arrivée (date la plus ancienne d'abord, personnes sans date à la fin) ou par N° */
+const gpSorted=k=>{const a=gpOf(k);if(k[0]!=='y'||GP.sort!=='date')return a;
+  return a.slice().sort((x,y)=>(!x.date_arrivee)-(!y.date_arrivee)||String(x.date_arrivee||'').localeCompare(String(y.date_arrivee||''))||(x.numero??1e9)-(y.numero??1e9))};
 const gpNorm=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ /g,' ').toLowerCase().replace(/\s+/g,' ').trim();
 const gpNf=x=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2}).format(Number(x)||0);
 const gpP=()=>GP.projets.find(p=>p.id===GP.cur);
@@ -814,14 +841,14 @@ function gpPage(k){
   const vers=k==='versement'||k==='attestation',lab=k==='versement'||k==='attestation'?'Versement':'Acompte',s=gpSum(k);
   $('gpBody').innerHTML=`<div class="panel"><div class="panelhead"><div><h3>${esc(gpLabel(k))}</h3><div class="muted">${s.c} personne${s.c>1?'s':''} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''} · Total ${money(s.t)}${k==='attestation'?' · Versement = superficie × '+gpNf(gpP().prix_m2)+' F':''}</div></div>
 <div class="toolbar gpbar"><button class="btn primary" type="button" data-gpadd>＋ Ajouter une personne</button><button class="btn light" type="button" data-gpcsv="${k}">Exporter CSV</button><button class="btn light" type="button" data-gpprint>Imprimer</button></div></div>
-<div class="searchrow gpbar"><input id="gpPq" type="search" maxlength="60" placeholder="Filtrer cette page (prénom, nom, téléphone)…" aria-label="Filtrer cette page" value="${esc(GP.pq)}"></div>
+<div class="searchrow gpbar"><input id="gpPq" type="search" maxlength="60" placeholder="Filtrer cette page (prénom, nom, téléphone)…" aria-label="Filtrer cette page" value="${esc(GP.pq)}">${k[0]==='y'?`<select id="gpSort" aria-label="Ordre d’affichage"><option value="date"${GP.sort==='date'?' selected':''}>Ordre d’arrivée (date la plus ancienne d’abord)</option><option value="num"${GP.sort==='num'?' selected':''}>Ordre des numéros (N°)</option></select>`:''}</div>
 <div class="tablewrap"><table><thead><tr><th>N°</th><th>Prénoms</th><th>Noms</th><th>Téléphone</th>${vers?'<th>N° parcelle</th><th class="num">Versement</th><th class="num">Superficie</th>':'<th>Date d’arrivée</th><th class="num">Acompte</th><th class="num">Nb</th>'}</tr></thead><tbody id="gpRows"></tbody>
 <tfoot><tr><td colspan="5">TOTAL ${k==='attestation'?'ATTESTATIONS':k==='versement'?'VERSEMENT COMPLET':'ACOMPTE'} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''}</td><td class="num">${money(s.t)}</td><td></td></tr></tfoot></table></div></div>`;
-  $('gpPq').oninput=e=>{GP.pq=e.target.value;gpRows(k)};gpRows(k);
+  $('gpPq').oninput=e=>{GP.pq=e.target.value;gpRows(k)};if($('gpSort'))$('gpSort').onchange=e=>{GP.sort=e.target.value;gpRows(k)};gpRows(k);
 }
 function gpRows(k){
   const vers=k==='versement'||k==='attestation',q=gpNorm(GP.pq),qd=GP.pq.replace(/\D/g,'');
-  const arr=gpOf(k).filter(l=>!q||gpNorm(l.prenom+' '+l.nom).includes(q)||(qd.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(qd)));
+  const arr=gpSorted(k).filter(l=>!q||gpNorm(l.prenom+' '+l.nom).includes(q)||(qd.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(qd)));
   $('gpRows').innerHTML=arr.map(l=>{const m=gpMt(l),np=(GP.pay[l.id]||[]).length;return `<tr class="${gpBad(l)?'bad':''}"><td>${esc(l.numero??'')}</td><td><button class="lnk" type="button" data-ligne="${esc(l.id)}">${esc(l.prenom)||'—'}</button></td><td>${esc(l.nom)}</td><td>${esc(l.telephone||'')}</td>${vers?`<td>${esc(l.n_parcelle||'')}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${l.superficie!=null?gpNf(l.superficie):''}</td>`:`<td class="dt">${esc(gpDate(l))}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${np>1?np:''}</td>`}</tr>`}).join('')||'<tr><td colspan="7" class="empty">Aucune personne sur cette page.</td></tr>';
 }
 
@@ -925,7 +952,7 @@ $('gpDel').onclick=async()=>{
 function gpCsv(k){
   const keys=k==='all'?gpKeys():[k],p=gpP();
   const h=['Page','N°','Prénoms','Noms','Téléphone','Date d’arrivée','N° parcelle','Superficie','Montant FCFA','Nombre d’acomptes'];
-  const rows=keys.flatMap(x=>gpOf(x).map(l=>[gpLabel(x),l.numero??'',l.prenom,l.nom,l.telephone||'',l.page==='versement'||l.page==='attestation'?'':gpDate(l),l.n_parcelle||'',l.superficie??'',gpMt(l),l.page==='attestation'?'':(GP.pay[l.id]||[]).length]));
+  const rows=keys.flatMap(x=>gpSorted(x).map(l=>[gpLabel(x),l.numero??'',l.prenom,l.nom,l.telephone||'',l.page==='versement'||l.page==='attestation'?'':gpDate(l),l.n_parcelle||'',l.superficie??'',gpMt(l),l.page==='attestation'?'':(GP.pay[l.id]||[]).length]));
   const csv='﻿'+[h,...rows].map(r=>r.map(csvCell).join(';')).join('\r\n');
   const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   const a=document.createElement('a');a.href=u;a.download=('Gestion_'+p.nom+'_'+(k==='all'?'complet':gpLabel(k))+'_'+new Date().toISOString().slice(0,10)).replace(/[^\w.-]+/g,'_')+'.csv';a.click();
