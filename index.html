@@ -53,7 +53,7 @@ body{margin:0;font:14px/1.5 var(--font);color:var(--ink);background:radial-gradi
 .stat:nth-child(4){--b:#ffdaa6;background:linear-gradient(145deg,#fff,#fff0dc)}
 .stat>*{position:relative}
 .stat span{color:var(--muted);font-size:12px}
-.stat strong{display:block;font-size:26px;margin:12px 0 4px;color:#243b88;letter-spacing:-1px}
+.stat strong{display:block;font-size:26px;margin:12px 0 4px;color:#243b88;letter-spacing:.5px;word-spacing:3px;font-variant-numeric:tabular-nums}
 .stat small{color:#8793aa;font-size:11px}
 .panelhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}
 .panel h3{margin:0;font-size:16px;color:#24396f}
@@ -274,6 +274,10 @@ tfoot td{font-weight:800;color:#14285f;background:#f4f7ff;border-top:2px solid #
 .lockcard textarea{margin-top:14px;min-height:74px}
 .lockcard .lact{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:14px}
 .lockcard .lst{margin-top:12px;font-size:13px}
+/* ===== Montants plus lisibles ===== */
+td.num,.gpsum td.num,.stat strong{font-variant-numeric:tabular-nums}
+td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
+#gpBody .stat strong{white-space:normal;font-size:clamp(17px,1.45vw,23px);letter-spacing:.3px;word-spacing:2px}
 /* ===== Droits des agents ===== */
 .perm{display:grid;gap:6px;white-space:normal;min-width:260px}
 .perm div{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px}
@@ -445,7 +449,9 @@ const IDLE_MS=15*60*1000, MAX_TRIES=5, LOCK_S=60;
 let client=null,user=null,profile=null,items=[],projets=[],curProjet=null,projEdit=null,photoBlob=null,editPhoto=null,photoUrls={},archived=[],editId=null,tries=0,lockUntil=0,idleT=null,opening=false;
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const money=x=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:0}).format(Number(x)||0)+' FCFA';
+/* Sommes lisibles : espace normal (insécable) entre les milliers au lieu de l'espace fine du navigateur */
+const nfr=(x,d)=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:d}).format(Number(x)||0).replace(/[\u202f\u00a0 ]/g,'\u00a0');
+const money=x=>nfr(x,0)+' FCFA';
 const ST={en_cours:'En cours',termine:'Terminé',suspendu:'Suspendu'};
 const pn=id=>projets.find(p=>p.id===id)?.nom||'—';
 const ini=(a,b)=>((a||'?')[0]+(b||'')[0]).toUpperCase();
@@ -798,7 +804,7 @@ const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',sort:'date'
 const gpSorted=k=>{const a=gpOf(k);if(k[0]!=='y'||GP.sort!=='date')return a;
   return a.slice().sort((x,y)=>(!x.date_arrivee)-(!y.date_arrivee)||String(x.date_arrivee||'').localeCompare(String(y.date_arrivee||''))||(x.numero??1e9)-(y.numero??1e9))};
 const gpNorm=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').replace(/ /g,' ').toLowerCase().replace(/\s+/g,' ').trim();
-const gpNf=x=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:2}).format(Number(x)||0);
+const gpNf=x=>nfr(x,2);
 const gpP=()=>GP.projets.find(p=>p.id===GP.cur);
 const gpKey=l=>l.page==='acompte'?'y'+l.annee:l.page;
 const gpLabel=k=>k[0]==='y'?'Année '+k.slice(1):({sans_date:'Sans date',versement:'Versement complet',attestation:'Attestations'})[k]||k;
