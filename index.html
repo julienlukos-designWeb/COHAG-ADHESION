@@ -288,6 +288,50 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 .perm input:disabled{cursor:wait}
 .roinfo{font-size:12px;color:#6b7aa6;background:#f4f7ff;border:1px dashed #c9d4ef;border-radius:11px;padding:10px 14px;grid-column:1/-1}
 </style>
+<style id="assistant">
+/* ===== Assistant COHAG ===== */
+#asFab{position:fixed;right:18px;bottom:18px;z-index:140;display:flex;align-items:center;gap:10px;border:2px solid #ffffffc0;border-radius:40px;padding:10px 18px 10px 10px;font:800 14px var(--font);color:#fff;cursor:pointer;background:linear-gradient(180deg,#43a6ff,#1d4fd8);box-shadow:0 6px 0 #0c3190,0 14px 26px #0b1d5255,inset 0 1px #fff9;transition:transform .12s}
+#asFab:hover{transform:translateY(-2px)}#asFab:active{transform:translateY(3px);box-shadow:0 2px 0 #0c3190}
+#asFab .asbot{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-size:21px;background:#fff;box-shadow:inset 0 -3px 0 #d6e0f4}
+#asFab.on{background:linear-gradient(180deg,#5b6b8f,#2d3a5c);box-shadow:0 6px 0 #1a2340,0 14px 26px #0b1d5255}
+#toasts{bottom:92px}
+#asPanel{position:fixed;right:18px;bottom:92px;z-index:141;width:min(430px,calc(100vw - 24px));height:min(640px,calc(100vh - 120px));display:flex;flex-direction:column;background:#f4f7fd;border:1px solid #d6e0f4;border-radius:22px;overflow:hidden;box-shadow:0 30px 60px #0b1d5255;animation:tin .25s ease}
+.ashd{display:flex;align-items:center;gap:12px;padding:14px 16px;color:#fff;background:linear-gradient(120deg,#0b1f55,#1a3aa8 60%,#1e5fd6)}
+.ashd .asbot{width:42px;height:42px;border-radius:14px;display:grid;place-items:center;font-size:22px;background:#ffffff26;box-shadow:inset 0 1px #fff8}
+.ashd b{display:block;font-size:15px}.ashd small{display:block;font-size:11.5px;color:#bcd0ff}
+.ashd .asx{margin-left:auto;display:flex;gap:6px}.ashd .asx button{border:0;border-radius:10px;width:34px;height:34px;cursor:pointer;color:#fff;background:#ffffff22;font-size:15px}
+#asLog{flex:1;overflow:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
+.asm{max-width:92%;font-size:13.5px;line-height:1.5;color:#22304f}
+.asm.bot{align-self:flex-start;background:#fff;border:1px solid #e0e7f5;border-radius:4px 16px 16px 16px;padding:10px 13px;box-shadow:0 3px 0 #e3e9f6}
+.asm.me{align-self:flex-end;color:#fff;background:linear-gradient(180deg,#4a6cf0,#2746c7);border-radius:16px 4px 16px 16px;padding:9px 13px;box-shadow:0 3px 0 #1d2f94}
+.asm:has(.ascard){max-width:100%;width:100%;padding:0;background:none;border:0;box-shadow:none}
+.ascard{background:#fff;border:1px solid #dfe6f5;border-radius:16px;padding:13px;box-shadow:0 4px 0 #dfe6f5}
+.ascard.guide{border-left:5px solid #2746c7}.ast{display:block;color:#14285f;font-size:14.5px;margin-bottom:6px}
+.asbody{font-size:13.5px}
+.ashead{display:flex;align-items:center;gap:4px}.ashead b{display:block;color:#14285f;font-size:15px}.ashead small{display:block;font-size:11.5px;color:#66748f}
+.askv{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px}
+.askv>div{background:#f4f7ff;border:1px solid #e3e9f7;border-radius:10px;padding:6px 9px;min-width:0}
+.askv small{display:block;font-size:10.5px;color:#66748f}.askv b{font-size:13px;color:#1f3380;word-break:break-word}
+.asact{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}.asact .btn{margin:0}
+.assteps{margin:6px 0;padding-left:20px}.assteps li{margin:4px 0}
+.asr{border-radius:10px;padding:7px 10px;margin:4px 0 6px;font-size:12.5px;font-weight:600}.asr.ok{background:#ecfdf3;color:#087f5b}.asr.no{background:#fff1f0;color:#b42318}
+.aschips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.aschips button{border:1px solid #c9d4f3;border-radius:20px;padding:7px 11px;font:700 12px var(--font);color:#1f3380;background:linear-gradient(180deg,#fff,#eef3ff);cursor:pointer;box-shadow:0 2px 0 #d3dcf2;text-align:left}
+.aschips button:active{transform:translateY(2px);box-shadow:none}
+.aslist{list-style:none;margin:8px 0 0;padding:0;display:grid;gap:6px}
+.aslist button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:8px;text-align:left;cursor:pointer;border:1px solid #dfe6f5;border-radius:12px;padding:9px 11px;background:#fff;font:13px var(--font);color:#22304f;box-shadow:0 3px 0 #e3e9f6}
+.aslist small{display:block;font-size:11.5px;color:#66748f}.aslist b{color:#14285f}
+.asmuted{font-size:12.5px;color:#52628b}
+.asok,.asmay{white-space:nowrap;font-size:10.5px;font-weight:800;border-radius:20px;padding:2px 8px}.asok{background:#dcfae6;color:#087f5b}.asmay{background:#fff4dc;color:#a15c00}
+.asarch{color:#b42318;font-weight:800}
+.asdots{display:inline-flex;gap:4px}.asdots i{width:7px;height:7px;border-radius:50%;background:#9fb0f5;animation:asd 1s infinite}.asdots i:nth-child(2){animation-delay:.15s}.asdots i:nth-child(3){animation-delay:.3s}
+@keyframes asd{50%{opacity:.25;transform:translateY(-3px)}}
+#asForm{display:flex;gap:8px;padding:10px;border-top:1px solid #dfe6f5;background:#fff}
+#asForm input{flex:1;margin:0}#asForm .btn{flex:none;margin:0;padding:10px 16px}
+.ashint{font-size:10.5px;color:#7a88ad;text-align:center;padding:0 10px 8px;background:#fff}
+@media(max-width:600px){#asPanel{inset:0;width:100%;height:100%;border-radius:0;border:0}#asFab{right:12px;bottom:12px;padding:8px}#asFab .astxt{display:none}#toasts{bottom:80px}}
+@media print{#asFab,#asPanel{display:none!important}}
+</style>
 </head>
 <body>
 <div class="layout">
@@ -435,6 +479,13 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 <label for="lockMotif" class="muted" style="display:block;text-align:left;margin-top:12px">Motif de l’urgence (facultatif)</label><textarea id="lockMotif" maxlength="400" placeholder="Ex. : versement d’un adhérent à enregistrer aujourd’hui"></textarea>
 <div class="lact"><button id="lockAsk" class="btn primary vbig" type="button">🚨 Demander l’accès d’urgence</button><button id="lockOut" class="btn light" type="button">Déconnexion</button></div>
 <div id="lockMsg" class="message lst" role="status"></div></div></div>
+<button id="asFab" class="hidden" type="button" aria-label="Ouvrir l’assistant COHAG"><span class="asbot">🤖</span><span class="astxt">Assistant</span></button>
+<section id="asPanel" class="hidden" role="dialog" aria-label="Assistant COHAG">
+<div class="ashd"><span class="asbot">🤖</span><div><b>Assistant COHAG</b><small>Guide de la plateforme · Recherche de personnes · 24h/24</small></div><div class="asx"><button id="asReset" type="button" title="Nouvelle conversation" aria-label="Nouvelle conversation">⟲</button><button id="asClose" type="button" title="Fermer" aria-label="Fermer">✕</button></div></div>
+<div id="asLog" aria-live="polite"></div>
+<form id="asForm" autocomplete="off"><input id="asIn" type="search" maxlength="120" placeholder="Une question, un nom, un téléphone, un matricule…" aria-label="Votre question"><button class="btn primary" type="submit">Envoyer</button></form>
+<div class="ashint">Données protégées : vous ne voyez que ce que votre compte est autorisé à voir.</div>
+</section>
 <div id="toasts" aria-live="polite"></div>
 <footer id="foot">COHAG — Accès réservé au personnel autorisé<br>Conçu par Gend Julien Dath Yanghane SENE, mle 15302/S</footer>
 </main></div>
@@ -1237,6 +1288,220 @@ $('dList').onclick=async e=>{
   msg('vMessage',ok?'Accès d’urgence accordé : l’agent est débloqué dans les 15 secondes.':'Demande refusée.','success');
   await usrLoad();const et=await cohagEtat();if(et)pollApply(et,true);
 };
+
+/* =====================================================================
+   ASSISTANT COHAG — guide de la plateforme + recherche intelligente
+   - Répond aux questions des agents sur l'utilisation de la plateforme
+     (réponses adaptées aux droits de la personne connectée).
+   - Retrouve un adhérent, une personne de la Gestion de projet ou un agent
+     même avec un nom incomplet ou mal orthographié, un téléphone ou un matricule.
+   Tout se passe dans le navigateur avec les données que l'utilisateur a déjà
+   le droit de voir (les règles RLS de Supabase s'appliquent). Rien n'est envoyé ailleurs.
+   ===================================================================== */
+const AS={open:false,gp:null,gpAt:0,ag:null,agAt:0,busy:false,res:[]};
+const asN=s=>String(s??'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().replace(/[’'`]/g,' ').replace(/[^a-z0-9 ]+/g,' ').replace(/\s+/g,' ').trim();
+const asPh=w=>w.replace(/ph/g,'f').replace(/ou/g,'u').replace(/y/g,'i').replace(/h/g,'').replace(/(.)\1+/g,'$1').replace(/e$/,'');
+function asLev(a,b){if(a===b)return 0;const m=a.length,n=b.length;if(!m)return n;if(!n)return m;let p=Array.from({length:n+1},(_,i)=>i);for(let i=1;i<=m;i++){const c=[i];for(let j=1;j<=n;j++)c[j]=Math.min(p[j]+1,c[j-1]+1,p[j-1]+(a[i-1]===b[j-1]?0:1));p=c}return p[n]}
+function asSim(q,w){
+  if(!q||!w)return 0;if(q===w)return 1;
+  if(q.length>=3&&w.startsWith(q))return .9;
+  if(asPh(q)===asPh(w))return .92;
+  if(q.length>=4&&w.includes(q))return .8;
+  const r=1-asLev(asPh(q),asPh(w))/Math.max(asPh(q).length,asPh(w).length,1);
+  return r>=.66?r*.95:0;
+}
+const AS_STOP=new Set('cherche chercher recherche rechercher trouve trouver retrouve retrouver info infos information informations renseignement renseignements renseigne donne donner moi sur le la les de du des d l un une adherent adherents agent agents gendarme membre membres personne fiche dossier numero num no n tel telephone portable matricule mle mat solde mr m mme madame monsieur mlle sgt adj adc mdl chef gend gendarme capitaine lieutenant colonel commandant qui est ou se trouve est il elle a au aux et svp stp'.split(' '));
+const asDigits=s=>String(s??'').replace(/\D/g,'');
+const asAlnum=s=>asN(s).replace(/ /g,'');
+
+/* ---------- Score d'une personne pour une recherche ---------- */
+function asScore(qWords,qNums,words,phones,mats){
+  let s=0,parts=0;
+  if(qWords.length){
+    const best=qWords.map(q=>Math.max(0,...words.map(w=>asSim(q,w))));
+    const miss=best.filter(v=>v<.6).length;
+    s+=best.reduce((a,b)=>a+b,0)/best.length*(miss?Math.max(.35,1-miss/best.length):1);parts++;
+  }
+  if(qNums.length){
+    const ok=qNums.every(d=>phones.some(p=>p&&p.includes(d))||mats.some(m=>m&&m.includes(d)));
+    const okMat=qNums.some(d=>mats.some(m=>m&&m===d));
+    s+=okMat?1:ok?.97:0;parts++;
+  }
+  return parts?s/parts:0;
+}
+function asParse(raw){
+  const n=asN(raw),toks=n.split(' ').filter(Boolean);
+  const qNums=[...new Set([...(raw.match(/\d[\d\s./-]{1,}\d|\d{3,}/g)||[]).map(x=>asDigits(x)).filter(d=>d.length>=3),...toks.filter(t=>/\d/.test(t)&&/[a-z]/.test(t)&&t.length>=3)])];
+  const qWords=toks.filter(t=>!/\d/.test(t)&&t.length>=2&&!AS_STOP.has(t));
+  return {qWords,qNums};
+}
+
+/* ---------- Données : Gestion de projet (tous les projets) et comptes agents ---------- */
+async function asLoadGp(){
+  if(AS.gp&&Date.now()-AS.gpAt<180000)return AS.gp;
+  if(!GP.projets.length){try{await gpFetchProjets()}catch(_){return AS.gp=[]}}
+  const page=async(t,c)=>{let out=[];for(let i=0;;i+=1000){const {data,error}=await client.from(t).select(c).order('id').range(i,i+999);if(error)throw error;out=out.concat(data||[]);if(!data||data.length<1000)break}return out};
+  try{
+    const [lg,pm]=await Promise.all([page('gp_lignes','id,projet_id,page,annee,numero,prenom,nom,telephone,date_arrivee,date_texte,n_parcelle,superficie'),page('gp_paiements','ligne_id,montant')]);
+    const tot={},nb={};pm.forEach(x=>{tot[x.ligne_id]=(tot[x.ligne_id]||0)+Number(x.montant||0);nb[x.ligne_id]=(nb[x.ligne_id]||0)+1});
+    AS.gp=lg.map(l=>{const p=GP.projets.find(x=>String(x.id)===String(l.projet_id));return {...l,proj:p?.nom||'—',mt:l.page==='attestation'?Math.round((Number(l.superficie)||0)*(Number(p?.prix_m2)||0)):(tot[l.id]||0),nb:nb[l.id]||0}});
+  }catch(e){console.error('assistant gp',e);AS.gp=[]}
+  AS.gpAt=Date.now();return AS.gp;
+}
+async function asLoadAgents(){
+  if(!isAdmin())return [];
+  if(AS.ag&&Date.now()-AS.agAt<180000)return AS.ag;
+  try{const d=await usrCall({action:'list'});let perms={};const {data:pr}=await client.rpc('cohag_agents_permissions');(pr||[]).forEach(r=>{perms[r.id]=r;});
+    AS.ag=(d.users||[]).map(u=>({...u,full_name:perms[u.id]?.full_name||u.full_name,permissions:perms[u.id]?.permissions||{}}))}catch(_){AS.ag=[]}
+  AS.agAt=Date.now();return AS.ag;
+}
+
+async function asSearchPeople(raw){
+  const {qWords,qNums}=asParse(raw);if(!qWords.length&&!qNums.length)return [];
+  const out=[];
+  const push=(type,obj,words,phones,mats)=>{const s=asScore(qWords,qNums,words,phones,mats);if(s>=.62)out.push({type,obj,s})};
+  [...items,...archived].forEach(a=>push('adh',a,asN(a.prenom+' '+a.nom).split(' '),[asDigits(a.telephone)],[asAlnum(a.matricule),asDigits(a.matricule),asAlnum(a.priv?.cni)]));
+  (await asLoadGp()).forEach(l=>push('gp',l,asN(l.prenom+' '+l.nom).split(' '),[asDigits(l.telephone)],[asAlnum(l.n_parcelle)]));
+  if(isAdmin())(await asLoadAgents()).forEach(u=>push('ag',u,asN((u.full_name||'')+' '+String(u.email||'').split('@')[0].replace(/[._-]/g,' ')).split(' '),[],[]));
+  return out.sort((a,b)=>b.s-a.s).slice(0,12);
+}
+
+/* ---------- Affichage des résultats ---------- */
+const asPct=s=>s>=.97?'<span class="asok">Correspondance exacte</span>':`<span class="asmay">Ressemblance ${Math.round(s*100)} %</span>`;
+const asKV=(l,v)=>v===''||v==null?'':`<div><small>${l}</small><b>${esc(v)}</b></div>`;
+function asCard(r,i){
+  const o=r.obj;
+  if(r.type==='adh'){
+    const arch=!!o.archived_at,mine=isAdmin()||o.created_by===user?.id;
+    return `<div class="ascard"><div class="ashead">${av(o)}<div><b>${esc(o.prenom)} ${esc(o.nom)}</b><small>👥 Adhérent${arch?' · <span class="asarch">ARCHIVÉ</span>':''} · ${asPct(r.s)}</small></div></div>
+    <div class="askv">${asKV('Matricule',o.matricule)}${asKV('Téléphone',o.telephone)}${asKV('Genre',o.genre)}${asKV('Profession',o.profession)}${asKV('Option',o.option_acquisition)}${asKV('Projet',pn(o.projet_id))}${asKV('Frais d’adhésion',money(o.frais_adhesion))}${asKV('Apport',money(o.apport))}${asKV('Date d’adhésion',o.date_adhesion)}${arch?asKV('Archivé le',new Date(o.archived_at).toLocaleDateString('fr-FR')):''}${isAdmin()?asKV('N° CNI',o.priv.cni)+asKV('Adresse',o.priv.adresse)+asKV('Banque',o.priv.banque)+asKV('N° compte',o.priv.compte_bancaire):''}</div>
+    <div class="asact">${arch?`<button class="btn mini light" type="button" data-asgo="archives">Voir dans Archives</button>`:`<button class="btn mini primary" type="button" data-asadh="${esc(o.id)}">Ouvrir dans la liste</button>${can('adh_modifier')&&mine?`<button class="btn mini light" type="button" data-asedit="${esc(o.id)}">Modifier</button>`:''}`}</div></div>`;
+  }
+  if(r.type==='gp'){
+    const lab=gpLabel(o.page==='acompte'?'y'+o.annee:o.page);
+    const dt=o.date_arrivee?new Date(o.date_arrivee+'T00:00:00').toLocaleDateString('fr-FR'):o.date_texte||'';
+    return `<div class="ascard"><div class="ashead"><span class="avs" style="background:linear-gradient(135deg,#d6245f,#ff8a3d)">${esc(ini(o.prenom,o.nom))}</span><div><b>${esc(o.prenom)} ${esc(o.nom)}</b><small>📒 Gestion de projet · ${asPct(r.s)}</small></div></div>
+    <div class="askv">${asKV('Projet',o.proj)}${asKV('Page',lab)}${asKV('N°',o.numero??'—')}${asKV('Téléphone',o.telephone)}${asKV('Date d’arrivée',dt)}${asKV('N° parcelle',o.n_parcelle)}${o.superficie!=null?asKV('Superficie',gpNf(o.superficie)+' m²'):''}${asKV(o.page==='attestation'?'Attestation':'Total versé',money(o.mt))}${o.page!=='attestation'?asKV('Nombre d’acomptes',o.nb):''}</div>
+    <div class="asact"><button class="btn mini primary" type="button" data-asgp="${esc(o.projet_id)}" data-asl="${esc(o.id)}">Ouvrir la fiche</button></div></div>`;
+  }
+  const p=o.permissions||{},dr=o.role==='admin'?'Tous les droits':Object.keys(PERMS).filter(k=>p[k]===true).map(k=>(k.startsWith('adh')?'Adhérents : ':'Gestion : ')+PERMS[k]).join(', ')||'Lecture seule';
+  return `<div class="ascard"><div class="ashead"><span class="avs" style="background:linear-gradient(135deg,#0b1f55,#2746c7)">${esc(ini((o.full_name||'?').split(' ')[0],(o.full_name||'').split(' ')[1]))}</span><div><b>${esc(o.full_name||'—')}</b><small>🔑 Compte ${o.role==='admin'?'administrateur':'agent de saisie'} · ${asPct(r.s)}</small></div></div>
+  <div class="askv">${asKV('E-mail',o.email)}${asKV('Statut',o.is_active?'Actif':'Désactivé')}<div style="grid-column:1/-1"><small>Droits</small><b>${esc(dr)}</b></div></div>
+  <div class="asact"><button class="btn mini primary" type="button" data-asgo="utilisateurs">Gérer ses droits</button></div></div>`;
+}
+function asList(res){
+  AS.res=res;
+  if(res.length===1)return asCard(res[0],0);
+  const ico={adh:'👥',gp:'📒',ag:'🔑'},where=r=>r.type==='adh'?(r.obj.archived_at?'Adhérent archivé':'Adhérent')+' · '+(r.obj.matricule||''):r.type==='gp'?r.obj.proj+' · '+gpLabel(r.obj.page==='acompte'?'y'+r.obj.annee:r.obj.page):'Compte '+(r.obj.role==='admin'?'admin':'agent');
+  return `<div class="asmuted">${res.length} personnes trouvées. Touchez un nom pour voir sa fiche :</div><ul class="aslist">${res.map((r,i)=>`<li><button type="button" data-asres="${i}"><span>${ico[r.type]} <b>${esc(r.type==='ag'?r.obj.full_name:r.obj.prenom+' '+r.obj.nom)}</b><small>${esc(where(r))}${r.obj.telephone?' · '+esc(r.obj.telephone):''}</small></span>${asPct(r.s)}</button></li>`).join('')}</ul>`;
+}
+
+/* ---------- Guide : questions-réponses (adaptées aux droits) ---------- */
+const asDroit=k=>can(k)?'<div class="asr ok">✅ Votre compte a ce droit.</div>':'<div class="asr no">⛔ Votre compte n’a pas ce droit. Demandez-le à l’administrateur : il le coche pour vous dans « Agents de saisie », l’effet est immédiat.</div>';
+const asAdm=()=>isAdmin()?'':'<div class="asr no">⛔ Réservé aux administrateurs.</div>';
+const asSteps=a=>'<ol class="assteps">'+a.map(x=>'<li>'+x+'</li>').join('')+'</ol>';
+const AS_TOPICS=[
+ {id:'droits',t:'Quels sont mes droits ?',k:'mes droits|mon compte|ce que je peux faire|autorise|permission|lecture seule|role',a:()=>{const l=Object.keys(PERMS).map(k=>`<li>${can(k)?'✅':'⛔'} ${k.startsWith('adh')?'Adhérents':'Gestion de projet'} : ${PERMS[k]}</li>`).join('');return isAdmin()?'Vous êtes <b>administrateur</b> : vous avez tous les droits, y compris Projets, Agents de saisie, Archives (restaurer) et l’export CSV.':`Vous êtes <b>agent de saisie</b>. Vos droits actuels :<ul class="assteps">${l}</ul>Sans droit coché, vous êtes en <b>lecture seule</b> : vous pouvez consulter, rechercher et imprimer. Pour obtenir un droit, demandez à l’administrateur.`}},
+ {id:'ajout_adh',t:'Comment enregistrer une nouvelle adhésion ?',k:'nouvelle adhesion|ajouter un adherent|enregistrer un adherent|inscrire|inscription|nouvel adherent|ajouter adhesion|creer un dossier|saisir une adhesion',go:'nouveau',need:'adh_ajouter',a:()=>asDroit('adh_ajouter')+asSteps(['Cliquez sur <b>➕ Nouvelle adhésion</b> dans le menu.','Ajoutez la <b>photo d’identité</b> (JPG, PNG ou WebP, 8 Mo maximum).','Remplissez tous les champs marqués * : prénom, nom, genre, matricule de solde, n° CNI, téléphone, adresse, profession, banque, n° de compte.','Choisissez les <b>frais d’adhésion</b> (26 000 ou 250 000 FCFA), saisissez l’<b>apport</b>, l’<b>option</b> (Villa, Terrain, Appartement) et le <b>projet</b>.','Indiquez la <b>date d’adhésion</b> (elle ne peut pas être dans le futur), puis cliquez sur <b>Enregistrer l’adhésion</b>.'])+'💡 Un même matricule ou n° CNI ne peut être enregistré qu’une seule fois.'},
+ {id:'modif_adh',t:'Comment modifier un dossier d’adhérent ?',k:'modifier un adherent|modifier un dossier|corriger un adherent|changer le telephone|erreur de saisie adherent|mettre a jour un adherent|modifier adhesion|corriger une erreur',go:'adherents',need:'adh_modifier',a:()=>asDroit('adh_modifier')+asSteps(['Ouvrez <b>👥 Adhérents</b> et recherchez la personne.','Cliquez sur <b>Modifier</b> au bout de sa ligne.','Corrigez les champs puis cliquez sur <b>Enregistrer les modifications</b>.'])+(isAdmin()?'':'⚠️ Un agent ne peut modifier <b>que les dossiers qu’il a lui-même créés</b>. Les informations sensibles (CNI, adresse, banque, n° de compte) ne sont modifiables que par un administrateur.')},
+ {id:'arch',t:'Comment archiver (retirer) un adhérent ?',k:'archiver|supprimer un adherent|retirer un adherent|effacer un adherent|enlever un adherent',go:'adherents',need:'adh_supprimer',a:()=>asDroit('adh_supprimer')+asSteps(['Ouvrez <b>👥 Adhérents</b> et trouvez la personne.','Cliquez sur <b>Archiver</b>, puis confirmez.'])+'Le dossier n’est pas effacé : il passe dans <b>🗄️ Archives</b>. Seul un administrateur peut le restaurer.'+(isAdmin()?'':' Un agent ne peut archiver que les dossiers qu’il a créés.')},
+ {id:'restaurer',t:'Comment restaurer un adhérent archivé ?',k:'restaurer|desarchiver|recuperer un adherent|remettre un adherent|archives',go:'archives',a:()=>asAdm()+asSteps(['Ouvrez <b>🗄️ Archives</b>.','Cliquez sur <b>Restaurer</b> sur la ligne de l’adhérent et confirmez.'])+'Le dossier revient aussitôt dans la liste des adhérents.'},
+ {id:'cherche',t:'Comment retrouver un adhérent dans la liste ?',k:'rechercher un adherent|retrouver un adherent|liste des adherents|filtrer|filtre|trouver un dossier|chercher dans la liste',go:'adherents',a:()=>asSteps(['Ouvrez <b>👥 Adhérents</b>.','Tapez dans la barre de recherche : nom, prénom, matricule, téléphone ou profession.','Affinez avec les filtres <b>Option</b> et <b>Projet</b>.'])+'💡 Plus simple : tapez directement le nom, le téléphone ou le matricule ici, dans l’assistant. Il trouve même les noms mal orthographiés (ex. « Ndiay » trouve « NDIAYE »).'},
+ {id:'doublon',t:'« Ce matricule ou ce n° de CNI est déjà enregistré »',k:'deja enregistre|deja utilise|doublon|matricule existe|cni existe|23505',a:()=>'Ce message signifie qu’un dossier existe déjà avec ce <b>matricule de solde</b> ou ce <b>n° CNI</b>, peut-être aux Archives.'+asSteps(['Tapez le matricule ici, dans l’assistant, pour retrouver le dossier existant (même archivé).','S’il s’agit de la même personne, modifiez le dossier existant au lieu d’en créer un nouveau.','S’il est archivé, demandez à un administrateur de le restaurer.'])},
+ {id:'photo',t:'La photo est refusée',k:'photo|image refusee|photo refusee|photo identite|envoi de la photo',a:()=>'La photo doit être au format <b>JPG, PNG ou WebP</b> et peser <b>moins de 8 Mo</b>. Elle est automatiquement réduite et nettoyée avant l’envoi.'+asSteps(['Prenez la photo avec le téléphone ou scannez-la.','Si elle est au format HEIC (iPhone) ou PDF, convertissez-la en JPG.','Si « Envoi de la photo impossible » s’affiche, vérifiez la connexion Internet et réessayez.'])},
+ {id:'refus',t:'« Action non autorisée pour votre compte »',k:'action non autorisee|non autorise|refuse|je ne peux pas|bouton absent|pas de bouton|pourquoi je ne vois pas|impossible de modifier|impossible d ajouter|impossible de supprimer|42501',a:()=>'Les boutons s’affichent selon vos droits, et la base de données refuse de toute façon les actions non autorisées. '+AS_TOPICS[0].a()+'<br>Rappel : un agent ne peut modifier ou archiver <b>que les adhérents qu’il a lui-même enregistrés</b>.'},
+ {id:'export',t:'Comment exporter ou imprimer la liste ?',k:'exporter|export|csv|excel|imprimer|impression|telecharger la liste',go:'adherents',a:()=>asSteps(['Ouvrez <b>👥 Adhérents</b> (filtrez si besoin).','<b>Imprimer</b> : imprime la liste affichée.',isAdmin()?'<b>Exporter CSV</b> : télécharge un fichier ouvrable dans Excel, avec toutes les informations.':'<b>Exporter CSV</b> est réservé aux administrateurs.'])+'Dans <b>Gestion de projet</b>, chaque page a aussi ses boutons <b>Exporter CSV</b> et <b>Imprimer</b>.'},
+ {id:'tdb',t:'Que signifient les chiffres du tableau de bord ?',k:'tableau de bord|accueil|chiffres|total adherents|frais d adhesion|apports declares|ce mois ci|statistiques',go:'dashboard',a:()=>'<ul class="assteps"><li><b>Total adhérents</b> : dossiers actifs (hors archives).</li><li><b>Frais d’adhésion</b> : somme des frais saisis.</li><li><b>Apports déclarés</b> : somme des apports.</li><li><b>Ce mois-ci</b> : adhésions dont la date est dans le mois en cours.</li></ul>Cliquez sur une carte de projet pour voir ses membres, avec les filtres Terrain, Villa et Appartement.'},
+ {id:'projets',t:'Comment créer ou désactiver un projet (adhésions) ?',k:'creer un projet|nouveau projet|ajouter un projet|desactiver un projet|projet propose|onglet projets|capacite',go:'projets',a:()=>asAdm()+asSteps(['Ouvrez <b>🏗️ Projets</b>.','Remplissez le nom (et si besoin localisation, statut, capacité, dates, description), puis <b>Ajouter le projet</b>.','<b>Modifier</b> pour corriger ; <b>Désactiver</b> pour ne plus le proposer dans le formulaire d’adhésion (les adhérents existants le gardent).'])+'Ne pas confondre avec <b>📒 Gestion de projet</b>, qui suit les acomptes.'},
+ {id:'membres_projet',t:'Comment voir les membres d’un projet ?',k:'membres du projet|membres d un projet|liste du projet|qui est dans le projet|adherents par projet',go:'dashboard',a:()=>asSteps(['Ouvrez le <b>🏠 Tableau de bord</b>.','Cliquez sur la carte du projet.','Filtrez par option (Terrain, Villa, Appartement) ou recherchez un membre.'])},
+ {id:'gp_intro',t:'Comment fonctionne la Gestion de projet ?',k:'gestion de projet|comment ca marche|pages|annee|sans date|versement complet|attestations|onglets du projet|fonctionnement',go:'gestion',a:()=>'La Gestion de projet reprend le logiciel Excel. Chaque projet a des pages :<ul class="assteps"><li><b>Année 20xx</b> : les acomptes des personnes arrivées cette année-là.</li><li><b>Sans date</b> : les acomptes sans date d’arrivée.</li><li><b>Versement complet</b> : ceux qui ont tout payé (n° parcelle, superficie).</li><li><b>Attestations</b> : montant = superficie × prix au m² (hors total).</li></ul>La page <b>🏠 Accueil</b> du projet donne les totaux, la recherche, la liste « À vérifier » et l’historique.'},
+ {id:'gp_ajout',t:'Comment ajouter une personne dans un projet ?',k:'ajouter une personne|nouvelle personne|inscrire dans le projet|ajouter dans la gestion|saisir une personne',go:'gestion',need:'gp_ajouter',a:()=>asDroit('gp_ajouter')+asSteps(['Ouvrez <b>📒 Gestion de projet</b> puis cliquez sur le projet.','Cliquez sur <b>＋ Ajouter une personne</b>.','Choisissez la <b>Page</b> (année, sans date, versement complet, attestation). Le N° est donné automatiquement.','Saisissez prénom, nom, téléphone, date d’arrivée (ou n° parcelle et superficie pour un versement ou une attestation).','Ajoutez ses acomptes (date, montant, note), puis <b>Enregistrer</b>.'])},
+ {id:'gp_acompte',t:'Comment enregistrer un acompte ou un versement ?',k:'acompte|enregistrer un versement|ajouter un acompte|saisir un acompte|paiement|versement d un membre|encaisser|nouveau versement',go:'gestion',need:'gp_modifier',a:()=>asDroit('gp_modifier')+asSteps(['Retrouvez la personne (tapez son nom ici, puis <b>Ouvrir la fiche</b>).','Dans sa fiche, cliquez sur <b>＋ Ajouter un acompte</b>.','Indiquez la date, le <b>montant</b> (nombre entier supérieur à 0) et une note si besoin.','Cliquez sur <b>Enregistrer</b> : le total de la personne et ceux du projet se recalculent tout seuls.'])+'💡 Si la personne n’existe pas encore dans le projet, ajoutez-la d’abord (droit « Ajouter »).'},
+ {id:'gp_corrige',t:'Comment corriger ou retirer un acompte ?',k:'corriger un acompte|retirer un acompte|supprimer un acompte|erreur de montant|mauvais montant|modifier un acompte',go:'gestion',need:'gp_modifier',a:()=>asDroit('gp_modifier')+asSteps(['Ouvrez la fiche de la personne.','Corrigez la date ou le montant directement dans la ligne, ou cliquez sur <b>✕</b> pour retirer l’acompte.','Cliquez sur <b>Enregistrer</b>. La modification est inscrite dans l’historique.'])},
+ {id:'gp_page',t:'Comment changer une personne de page ?',k:'changer de page|deplacer une personne|mauvaise annee|mauvaise page|passer en versement complet|changer d annee',go:'gestion',need:'gp_modifier',a:()=>asDroit('gp_modifier')+asSteps(['Ouvrez la fiche de la personne.','Choisissez la nouvelle <b>Page</b> dans la liste (une autre année, Versement complet…).','Laissez le N° vide pour recevoir le numéro suivant de la page, puis <b>Enregistrer</b>.'])},
+ {id:'gp_supp',t:'Comment supprimer une personne d’un projet ?',k:'supprimer une personne|retirer une personne|effacer une personne|supprimer dans la gestion',go:'gestion',need:'gp_supprimer',a:()=>asDroit('gp_supprimer')+asSteps(['Ouvrez la fiche de la personne.','Cliquez sur <b>Supprimer la personne</b> et confirmez.'])+'⚠️ La suppression est définitive et efface aussi ses acomptes.'},
+ {id:'gp_annee',t:'Comment ajouter une nouvelle année ?',k:'ajouter une annee|nouvelle annee|annee suivante|page annee',go:'gestion',need:'gp_modifier',a:()=>asDroit('gp_modifier')+asSteps(['Ouvrez le projet dans <b>📒 Gestion de projet</b>.','Cliquez sur l’onglet vert <b>＋ Année</b>.','Tapez l’année (ex. 2027) et validez : la page est créée.'])},
+ {id:'gp_attest',t:'Comment est calculée une attestation ?',k:'attestation|calcul attestation|prix au m2|prix du metre carre|superficie',go:'gestion',a:()=>'Montant de l’attestation = <b>superficie (m²) × prix au m²</b> du projet. Il est calculé automatiquement et n’entre pas dans le total des acomptes et versements.'+asSteps(['Pour changer le prix au m² : ouvrez le projet, puis <b>⚙ Paramètres</b> (droit « Modifier » de la Gestion de projet).'])},
+ {id:'gp_verif',t:'Que signifie la liste « À vérifier » ?',k:'a verifier|anomalie|date en rouge|date invalide|pas de date|ligne rouge',go:'gestion',a:()=>'Elle regroupe les personnes dont la <b>date d’arrivée est illisible</b> (reprise d’Excel) ou <b>d’une autre année que leur page</b>. Ces lignes apparaissent en rouge.'+asSteps(['Cliquez sur la personne.','Corrigez la date, ou changez-la de page, puis <b>Enregistrer</b>.'])},
+ {id:'gp_cherche',t:'Comment rechercher dans la Gestion de projet ?',k:'rechercher dans la gestion|recherche gestion|trier|ordre d arrivee|ordre des numeros',go:'gestion',a:()=>'Dans un projet, l’<b>Accueil</b> cherche dans toutes les pages (mot entier du prénom ou du nom, ou chiffres du téléphone). Chaque page a aussi un filtre et un tri : <b>ordre d’arrivée</b> ou <b>ordre des numéros</b>.<br>💡 L’assistant, lui, cherche dans <b>tous les projets à la fois</b> et tolère les fautes d’orthographe.'},
+ {id:'gp_param',t:'Comment modifier ou supprimer un projet de gestion ?',k:'parametres du projet|renommer le projet|supprimer le projet|modifier le projet de gestion|creer un projet de gestion',go:'gestion',a:()=>`<b>Créer</b> : formulaire « Ajouter un projet » en bas de la page Gestion de projet (droit Ajouter). ${can('gp_ajouter')?'✅':'⛔'}<br><b>Paramètres</b> (nom, localisation, prix au m²) : bouton <b>⚙ Paramètres</b> dans le projet (droit Modifier). ${can('gp_modifier')?'✅':'⛔'}<br><b>Supprimer</b> : bouton <b>Supprimer le projet</b>, puis tapez son nom pour confirmer (droit Supprimer). ${can('gp_supprimer')?'✅':'⛔'}<br>⚠️ Supprimer un projet efface définitivement toutes ses personnes et tous ses acomptes.`},
+ {id:'histo',t:'Où voir qui a modifié quoi ?',k:'historique|qui a modifie|journal|dernieres modifications|trace|qui a supprime|qui a ajoute',go:'gestion',a:()=>'Chaque ajout, modification ou suppression dans la Gestion de projet est enregistré automatiquement, avec le nom de l’agent, la date et l’heure. Ce journal n’est pas modifiable.'+asSteps(['<b>Tous les projets</b> : panneau « 🕘 Dernières modifications » de la page Gestion de projet.','<b>Un projet</b> : panneau « Historique de ce projet » sur son Accueil.','Filtrez par agent avec la liste déroulante.'])+'Les notifications en bas à droite signalent les modifications faites par les autres.'},
+ {id:'verrou',t:'L’écran « Accès momentanément verrouillé » s’affiche',k:'verrouille|verrouillage|bloque|acces bloque|acces d urgence|demande d acces|plateforme verrouillee|deverrouiller',a:()=>isAdmin()?asSteps(['Ouvrez <b>🔑 Agents de saisie</b>.','Le grand bouton <b>Verrouiller / Déverrouiller tous les comptes</b> bloque ou rouvre l’accès de tous les agents (les administrateurs gardent l’accès).','Les demandes d’accès d’urgence apparaissent dessous : <b>✅ Accorder l’accès</b> ou <b>Refuser</b>. L’agent est débloqué dans les 15 secondes.']):'L’administrateur a verrouillé les comptes agents.'+asSteps(['Sur l’écran de verrouillage, écrivez le motif (ex. « versement à enregistrer aujourd’hui »).','Cliquez sur <b>🚨 Demander l’accès d’urgence</b>.','La page se débloque toute seule dès que l’administrateur accepte.'])},
+ {id:'agents',t:'Comment créer un agent et lui donner des droits ?',k:'creer un agent|nouvel agent|ajouter un agent|donner des droits|cocher les droits|desactiver un agent|renommer un agent|compte agent',go:'utilisateurs',a:()=>asAdm()+asSteps(['Ouvrez <b>🔑 Agents de saisie</b>.','Saisissez nom, e-mail et mot de passe temporaire (10 caractères minimum), puis <b>Créer l’agent</b>.','Le nouvel agent est en <b>lecture seule</b> : cochez ses droits dans le tableau (Adhérents ou Gestion de projet : Ajouter, Modifier, Archiver ou Supprimer). C’est enregistré immédiatement.','<b>✏️ Modifier</b> change son nom ; <b>Désactiver</b> l’empêche de se connecter.'])+'Transmettez l’e-mail et le mot de passe à l’agent séparément.'},
+ {id:'connexion',t:'Problème de connexion ou déconnexion automatique',k:'connexion|mot de passe|deconnecte|deconnexion|session expiree|mot de passe oublie|trop de tentatives|je n arrive pas a me connecter',a:()=>'<ul class="assteps"><li>Après <b>15 minutes sans activité</b>, la session se ferme pour votre sécurité : reconnectez-vous.</li><li>Après <b>5 erreurs</b> de mot de passe, il faut attendre 60 secondes.</li><li><b>Mot de passe oublié</b> ou compte désactivé : contactez l’administrateur.</li><li>Ne partagez jamais votre mot de passe.</li></ul>'},
+ {id:'affichage',t:'Les données ne s’affichent pas ou ne sont pas à jour',k:'ne s affiche pas|pas a jour|chargement|actualiser|rafraichir|bug|probleme d affichage|donnees manquantes|lent',a:()=>asSteps(['Dans un projet de gestion, cliquez sur <b>⟳ Actualiser</b>.','Sinon, rechargez la page (touche F5, ou tirez vers le bas sur téléphone).','Vérifiez votre connexion Internet.','Si cela continue, déconnectez-vous puis reconnectez-vous et prévenez l’administrateur.'])},
+ {id:'sensible',t:'Pourquoi je ne vois pas la CNI ou le compte bancaire ?',k:'cni|compte bancaire|banque|adresse|informations sensibles|donnees sensibles|confidentiel',a:()=>isAdmin()?'En tant qu’administrateur, vous voyez la CNI, l’adresse, la banque et le n° de compte (dans la liste, l’export CSV et les fiches de l’assistant).':'Pour protéger les adhérents, la <b>CNI, l’adresse, la banque et le n° de compte</b> ne sont visibles et modifiables que par les administrateurs. Vous les saisissez lors d’une nouvelle adhésion, mais vous ne les voyez plus ensuite.'},
+];
+function asTopicScore(t,q){
+  const n=' '+asN(q)+' ';let s=0;
+  t.k.split('|').forEach(k=>{const kk=asN(k);if(n.includes(' '+kk+' ')||n.includes(' '+kk))s+=kk.split(' ').length>1?3:2});
+  const tw=asN(t.t).split(' ').filter(w=>w.length>3),qw=asN(q).split(' ').filter(w=>w.length>3&&!AS_STOP.has(w));
+  qw.forEach(w=>{if(tw.some(x=>asSim(w,x)>=.85))s+=1});
+  return s;
+}
+const AS_HOWTO=/^(comment|pourquoi|ou |quand|que |quoi|qu |quel|quelle|puis|peut|est ce|je n|j ai|je ne|je veux|je voudrais|aide|explique|c est quoi|ca veut dire|signifie|impossible|probleme|erreur|ajouter|enregistrer|modifier|supprimer|archiver|restaurer|creer|exporter|imprimer|corriger|changer|saisir)/;
+function asTopicHtml(t){
+  const go=t.go&&(isAdmin()||!['projets','utilisateurs'].includes(t.go))?t.go:null;
+  return `<div class="ascard guide"><b class="ast">${esc(t.t)}</b><div class="asbody">${t.a()}</div>${go?`<div class="asact"><button class="btn mini primary" type="button" data-asgo="${go}">M’y emmener →</button></div>`:''}</div>`;
+}
+
+/* ---------- Conversation ---------- */
+function asMsg(html,who){const b=$('asLog'),d=document.createElement('div');d.className='asm '+(who||'bot');d.innerHTML=html;b.appendChild(d);b.scrollTop=b.scrollHeight;return d}
+function asWelcome(){
+  $('asLog').innerHTML='';
+  const nm=(profile?.full_name||'').split(' ')[0];
+  asMsg(`Bonjour${nm?' '+esc(nm):''} 👋 Je suis l’<b>assistant COHAG</b>, disponible 24h/24.<br>• Posez-moi une question sur la plateforme (« comment enregistrer un acompte ? »).<br>• Ou tapez un <b>nom, un téléphone ou un matricule</b> : je retrouve la personne, même mal orthographiée, dans les adhérents${isAdmin()?', les agents':''} et tous les projets de gestion.`);
+  asChips();
+}
+function asChips(){
+  const list=['droits','ajout_adh','gp_acompte','gp_ajout','doublon','verrou'].concat(isAdmin()?['agents']:['refus']);
+  asMsg('<div class="aschips">'+list.map(id=>{const t=AS_TOPICS.find(x=>x.id===id);return `<button type="button" data-astopic="${id}">${esc(t.t)}</button>`}).join('')+'<button type="button" data-asall>📚 Tous les sujets</button></div>');
+}
+async function asAsk(q){
+  q=q.trim();if(!q||AS.busy)return;
+  asMsg(esc(q),'me');$('asIn').value='';
+  const n=asN(q);
+  const scored=AS_TOPICS.map(t=>({t,s:asTopicScore(t,q)})).filter(x=>x.s>0).sort((a,b)=>b.s-a.s);
+  const howto=AS_HOWTO.test(n)||n.split(' ').length>=6;
+  const {qWords,qNums}=asParse(q);
+  const wait=asMsg('<span class="asdots"><i></i><i></i><i></i></span>');AS.busy=true;
+  let res=[];
+  try{if(!howto||!scored.length)res=await asSearchPeople(q)}finally{AS.busy=false}
+  wait.remove();
+  if(howto&&scored.length){
+    asMsg(asTopicHtml(scored[0].t));
+    if(scored.length>1)asMsg('Sujets proches : <div class="aschips">'+scored.slice(1,4).map(x=>`<button type="button" data-astopic="${x.t.id}">${esc(x.t.t)}</button>`).join('')+'</div>');
+    return;
+  }
+  if(res.length){asMsg(asList(res));if(scored.length&&scored[0].s>=3)asMsg('Vous cherchiez peut-être aussi : <div class="aschips"><button type="button" data-astopic="'+scored[0].t.id+'">'+esc(scored[0].t.t)+'</button></div>');return}
+  if(scored.length){asMsg(asTopicHtml(scored[0].t));return}
+  if(qWords.length||qNums.length){asMsg(`Je n’ai trouvé personne qui ressemble à « <b>${esc(q)}</b> ».<ul class="assteps"><li>Essayez seulement le <b>nom de famille</b>, ou seulement le <b>prénom</b>.</li><li>Essayez avec le <b>numéro de téléphone</b> (au moins 3 chiffres) ou le <b>matricule</b>.</li><li>La personne a peut-être été supprimée de la Gestion de projet${isAdmin()?'':' ou se trouve dans un dossier que vous ne pouvez pas voir'}.</li></ul>`);return}
+  asMsg('Je n’ai pas compris la question. Choisissez un sujet ou reformulez :');asChips();
+}
+function asAll(){asMsg('<div class="aschips">'+AS_TOPICS.filter(t=>isAdmin()||!['projets','agents','restaurer'].includes(t.id)).map(t=>`<button type="button" data-astopic="${t.id}">${esc(t.t)}</button>`).join('')+'</div>')}
+function asToggle(on){
+  AS.open=on===undefined?!AS.open:on;$('asPanel').classList.toggle('hidden',!AS.open);$('asFab').classList.toggle('on',AS.open);
+  if(AS.open){if(!$('asLog').children.length)asWelcome();setTimeout(()=>$('asIn').focus(),50);AS.gp=null;asLoadGp()}
+}
+function asReady(){
+  const ok=!!user&&$('lockView').classList.contains('hidden');
+  $('asFab').classList.toggle('hidden',!ok);if(!ok&&AS.open)asToggle(false);
+  if(!user&&$('asLog').children.length){$('asLog').innerHTML='';AS.gp=null;AS.ag=null}
+}
+setInterval(asReady,800);
+$('asFab').onclick=()=>asToggle();$('asClose').onclick=()=>asToggle(false);$('asReset').onclick=asWelcome;
+$('asForm').onsubmit=e=>{e.preventDefault();asAsk($('asIn').value)};
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&AS.open)asToggle(false)});
+$('asLog').addEventListener('click',async e=>{
+  const b=e.target.closest('button');if(!b||!user)return;const d=b.dataset;
+  if(d.astopic){const t=AS_TOPICS.find(x=>x.id===d.astopic);if(t){asMsg(esc(t.t),'me');asMsg(asTopicHtml(t))}return}
+  if('asall' in d)return asAll();
+  if(d.asres){const r=AS.res[Number(d.asres)];if(r)asMsg(asCard(r));return}
+  if(d.asgo){if(window.innerWidth<700)asToggle(false);return go(d.asgo)}
+  if(d.asadh){const a=items.find(x=>String(x.id)===d.asadh);if(!a)return;if(window.innerWidth<700)asToggle(false);go('adherents');$('search').value=a.matricule||(a.prenom+' '+a.nom);table();return}
+  if(d.asedit){const a=items.find(x=>String(x.id)===d.asedit);if(a){if(window.innerWidth<700)asToggle(false);startEdit(a)}return}
+  if(d.asgp){if(window.innerWidth<700)asToggle(false);await gpOpen(d.asgp);gpFiche(d.asl);return}
+});
 
 if(initSupabase()){
   client.auth.getSession().then(({data})=>{if(data.session?.user)openApp(data.session.user)});
