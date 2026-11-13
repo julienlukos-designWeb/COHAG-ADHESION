@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'unsafe-inline'; connect-src https://zymyvfctoldjybbnmkjs.supabase.co wss://zymyvfctoldjybbnmkjs.supabase.co; img-src 'self' data: https://zymyvfctoldjybbnmkjs.supabase.co; manifest-src 'self'; worker-src 'self'; base-uri 'none'; form-action 'none'">
-<meta name="referrer" content="no-referrer"><meta name="theme-color" content="#2746c7"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png">
+<meta name="referrer" content="no-referrer"><meta name="theme-color" content="#2746c7"><link rel="manifest" href="manifest.webmanifest"><link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="robots" content="noindex,nofollow">
 <title>COHAG — Gestion des adhésions et projets</title>
 <style>
@@ -331,6 +331,18 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 .ashint{font-size:10.5px;color:#7a88ad;text-align:center;padding:0 10px 8px;background:#fff}
 @media(max-width:600px){#asPanel{inset:0;width:100%;height:100%;border-radius:0;border:0}#asFab{right:12px;bottom:12px;padding:8px}#asFab .astxt{display:none}#toasts{bottom:80px}}
 @media print{#asFab,#asPanel{display:none!important}}
+/* Archives par année + Corbeille */
+.arctabs{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px}
+.arctab{border:1px solid var(--line);background:#fff;color:var(--ink);padding:11px 18px;border-radius:12px;font:800 14px var(--font);cursor:pointer;box-shadow:0 3px 0 #d5dcef}
+.arctab.active{background:linear-gradient(180deg,#b98cff,#7a35e0);color:#fff;border-color:#7a35e0;box-shadow:0 3px 0 #4f1fa0}
+.arctab span{font-weight:700;opacity:.85}
+.ychips{display:flex;gap:10px;flex-wrap:wrap;margin:6px 0 16px}
+.ychip{display:flex;flex-direction:column;align-items:flex-start;border:1px solid var(--line);background:#f6f8ff;color:var(--ink);padding:10px 16px;border-radius:12px;font:800 18px var(--font);cursor:pointer;min-width:110px}
+.ychip small{font:600 11px var(--font);color:var(--muted)}
+.ychip.on{background:linear-gradient(180deg,#5b72f0,#2746c7);color:#fff;border-color:#2746c7}
+.ychip.on small{color:#e3e9ff}
+.acts .btn+.btn{margin-left:6px}
+@media print{.arctabs,.ychips{display:none!important}}
 </style>
 </head>
 <body>
@@ -403,10 +415,40 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 <div class="actions"><button class="btn light" type="reset">Effacer</button><button id="saveBtn" class="btn primary" type="submit">Enregistrer l’adhésion</button></div>
 <div id="formMessage" class="message" role="alert" style="grid-column:1/-1"></div>
 </form></div></section>
-<section id="archivesView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3>Adhérents archivés</h3><div class="muted">Dossiers retirés de la liste. Seuls les administrateurs peuvent les restaurer.</div></div></div>
+<section id="archivesView" class="view hidden">
+<div class="arctabs" role="tablist" aria-label="Archives"><button type="button" class="arctab active" data-arctab="hist">📚 Archives par année <span id="arcHistN"></span></button><button type="button" class="arctab" data-arctab="corb">🗑️ Corbeille <span id="arcCorbN"></span></button></div>
+<div id="arcHistPane">
+<div class="panel"><div class="panelhead"><div><h3>Archives d’adhésion par année</h3><div class="muted">Anciens adhérents classés selon l’année de leur date d’adhésion. Choisissez une année.</div></div><div class="toolbar"><button id="arcAddBtn" class="btn primary hidden" type="button">➕ Ajouter un ancien adhérent</button></div></div>
+<div id="arcYears" class="ychips"></div>
+<div class="searchrow"><input id="arcSearch" type="search" maxlength="60" placeholder="Rechercher dans cette année : nom, prénom, matricule, téléphone…" aria-label="Rechercher dans les archives"></div>
+<div id="arcHMessage" class="message" role="alert"></div>
+<div class="tablewrap"><table><thead><tr><th>Prénom et nom</th><th>Matricule</th><th>Téléphone</th><th>Option</th><th>Projet</th><th>Frais</th><th>Apport</th><th>Date d’adhésion</th><th class="acts">Actions</th></tr></thead><tbody id="arcHRows"></tbody></table></div></div>
+<div id="arcFormPanel" class="panel hidden"><div class="panelhead"><div><h3>Ajouter un ancien adhérent aux archives</h3><div class="muted">Il sera rangé automatiquement dans l’année de sa date d’adhésion. Les champs marqués * sont obligatoires.</div></div></div>
+<form id="arcForm" class="formgrid" autocomplete="off">
+<div><label for="a_prenom">Prénom *</label><input id="a_prenom" name="prenom" required maxlength="60"></div>
+<div><label for="a_nom">Nom *</label><input id="a_nom" name="nom" required maxlength="60"></div>
+<div><label for="a_genre">Genre *</label><select id="a_genre" name="genre" required><option value="">Choisir…</option><option>Féminin</option><option>Masculin</option></select></div>
+<div><label for="a_mat">Matricule de solde *</label><input id="a_mat" name="matricule" required maxlength="30" pattern="[A-Za-z0-9\/\- ]{3,30}" title="3 à 30 caractères : lettres, chiffres, / ou -"></div>
+<div><label for="a_tel">Téléphone</label><input id="a_tel" name="telephone" type="tel" maxlength="20" pattern="[+0-9 ()\-]{8,20}" title="8 à 20 chiffres (le + est autorisé)"></div>
+<div><label for="a_prof">Profession</label><input id="a_prof" name="profession" maxlength="80"></div>
+<div><label for="a_opt">Option d’acquisition *</label><select id="a_opt" name="option_acquisition" required><option value="">Choisir…</option><option>Villa</option><option>Terrain</option><option>Appartement</option></select></div>
+<div><label for="a_proj">Projet</label><select id="a_proj" name="projet"><option value="">Non renseigné</option></select></div>
+<div><label for="a_frais">Frais d’adhésion *</label><select id="a_frais" name="frais_adhesion" required><option value="">Choisir…</option><option value="26000">26 000 FCFA</option><option value="250000">250 000 FCFA</option></select></div>
+<div><label for="a_apport">Acompte / Apport (FCFA)</label><input id="a_apport" name="apport" type="number" inputmode="numeric" min="0" max="1000000000" step="1" value="0"></div>
+<div><label for="a_date">Date d’adhésion *</label><input id="a_date" name="date_adhesion" type="date" min="1990-01-01" required></div>
+<div class="actions"><button id="arcCancel" class="btn light" type="button">Fermer</button><button id="arcSave" class="btn primary" type="submit">Enregistrer dans les archives</button></div>
+</form><div id="arcFMessage" class="message" role="alert"></div></div>
+</div>
+<div id="arcCorbPane" class="hidden">
+<div class="panel"><div class="panelhead"><div><h3>🗑️ Corbeille — adhérents</h3><div class="muted">Adhérents supprimés de la liste. Ils peuvent être restaurés, ou supprimés définitivement (action irréversible).</div></div></div>
 <div id="arcMessage" class="message" role="alert"></div>
-<div class="tablewrap"><table><thead><tr><th>Prénom et nom</th><th>Matricule</th><th>Option</th><th>Date d’adhésion</th><th>Archivé le</th><th class="acts">Action</th></tr></thead><tbody id="arcRows"></tbody></table></div></div></section>
-<section id="projetsView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3>Projets</h3><div class="muted">Les projets proposés aux adhérents dans le formulaire. Réservé aux administrateurs.</div></div></div>
+<div class="tablewrap"><table><thead><tr><th>Prénom et nom</th><th>Matricule</th><th>Option</th><th>Date d’adhésion</th><th>Supprimé le</th><th class="acts">Actions</th></tr></thead><tbody id="arcRows"></tbody></table></div></div>
+<div class="panel"><div class="panelhead"><div><h3>🗑️ Corbeille — projets</h3><div class="muted">Projets supprimés de l’onglet « Projets ».</div></div></div>
+<div id="pcMessage" class="message" role="alert"></div>
+<div class="tablewrap"><table><thead><tr><th>Projet</th><th>Localisation</th><th>Supprimé le</th><th class="acts">Actions</th></tr></thead><tbody id="pcRows"></tbody></table></div></div>
+</div>
+</section>
+<section id="projetsView" class="view hidden"><div class="panel"><div class="panelhead"><div><h3>Projets</h3><div class="muted">Les projets proposés aux adhérents dans le formulaire. Création et modification : administrateurs. Un projet supprimé va dans Archives › Corbeille.</div></div></div>
 <form id="projForm" class="formgrid" autocomplete="off">
 <div><label for="pj_nom">Nom du projet *</label><input id="pj_nom" name="nom" required maxlength="80"></div>
 <div><label for="pj_loc">Localisation</label><input id="pj_loc" name="localisation" maxlength="120"></div>
@@ -497,6 +539,7 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 const SUPABASE_URL='https://zymyvfctoldjybbnmkjs.supabase.co';
 const SUPABASE_KEY='sb_publishable_cNy2H5DvKHJvIODpMXUo7w_bu1BQRJA';
 const IDLE_MS=15*60*1000, MAX_TRIES=5, LOCK_S=60;
+let projAll=[],projCorb=[],arcYear=null;
 let client=null,user=null,profile=null,items=[],projets=[],curProjet=null,projEdit=null,photoBlob=null,editPhoto=null,photoUrls={},archived=[],editId=null,tries=0,lockUntil=0,idleT=null,opening=false;
 const $=id=>document.getElementById(id);
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -504,25 +547,34 @@ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 const nfr=(x,d)=>new Intl.NumberFormat('fr-FR',{maximumFractionDigits:d}).format(Number(x)||0).replace(/[\u202f\u00a0 ]/g,'\u00a0');
 const money=x=>nfr(x,0)+' FCFA';
 const ST={en_cours:'En cours',termine:'Terminé',suspendu:'Suspendu'};
-const pn=id=>projets.find(p=>p.id===id)?.nom||'—';
+const pn=id=>projAll.find(p=>p.id===id)?.nom||'—';
 const ini=(a,b)=>((a||'?')[0]+(b||'')[0]).toUpperCase();
 const ago=d=>{const m=Math.max(0,Math.round((Date.now()-new Date(d))/60000));return m<60?'Il y a '+m+' min':m<1440?'Il y a '+Math.round(m/60)+' h':'Il y a '+Math.round(m/1440)+' j'};
 const isAdmin=()=>profile?.role==='admin';
 /* Droits : l'administrateur a tout ; un agent n'a que les droits cochés pour lui (lecture seule par défaut).
    L'interface cache les boutons, et la base refuse de toute façon l'action (gardes SQL). */
-const PERMS={adh_ajouter:'Ajouter',adh_modifier:'Modifier',adh_supprimer:'Archiver',gp_ajouter:'Ajouter',gp_modifier:'Modifier',gp_supprimer:'Supprimer'};
+const PERMS={adh_ajouter:'Ajouter',adh_modifier:'Modifier',adh_supprimer:'Mettre à la corbeille',adh_archiver:'Saisir des archives',adh_restaurer:'Restaurer',adh_supprimer_def:'Supprimer définitivement',proj_supprimer:'Mettre à la corbeille',proj_restaurer:'Restaurer',proj_supprimer_def:'Supprimer définitivement',gp_ajouter:'Ajouter',gp_modifier:'Modifier',gp_supprimer:'Supprimer'};
+const PERM_GROUPS=[['ADHÉRENTS',['adh_ajouter','adh_modifier','adh_supprimer']],['ARCHIVES ET CORBEILLE',['adh_archiver','adh_restaurer','adh_supprimer_def']],['PROJETS',['proj_supprimer','proj_restaurer','proj_supprimer_def']],['GESTION DE PROJET',['gp_ajouter','gp_modifier','gp_supprimer']]];
+const permGroup=k=>k.startsWith('gp')?'Gestion de projet':k.startsWith('proj')?'Projets':['adh_archiver','adh_restaurer','adh_supprimer_def'].includes(k)?'Archives':'Adhérents';
 const can=k=>isAdmin()||!!(profile&&profile.active!==false&&profile.permissions&&profile.permissions[k]===true);
 const denied=e=>e&&e.code==='42501';
 const DENY='Action non autorisée pour votre compte. Demandez ce droit à l’administrateur.';
+const canProjTab=()=>isAdmin()||can('proj_supprimer');
+/* Messages des fonctions SQL : on affiche le texte français prévu (introuvable, adhérents rattachés…) */
+const rpcErr=(e,t)=>{console.error('cohag',e);if(denied(e))return DENY;if(e&&e.code==='PGRST202')return 'Exécutez d’abord le script « cohag_archives_corbeille.sql » dans Supabase.';if(e&&['P0002','22023','23503'].includes(e.code)&&e.message)return e.message;return t+' (code '+(e&&e.code||'?')+')'};
 function applyPerms(){
   if(!user)return;
   document.querySelector('.nav[data-view=nouveau]').classList.toggle('hidden',!can('adh_ajouter'));
   document.querySelectorAll('.toolbar [data-goto="nouveau"]').forEach(b=>b.classList.toggle('hidden',!can('adh_ajouter')));
+  document.querySelector('.nav[data-view=projets]').classList.toggle('hidden',!canProjTab());
+  $('projForm').classList.toggle('hidden',!isAdmin());
+  $('arcAddBtn').classList.toggle('hidden',!can('adh_archiver'));
+  if(!can('adh_archiver'))$('arcFormPanel').classList.add('hidden');
 }
 function msg(id,t,cls=''){const e=$(id);e.textContent=t;e.className='message '+cls}
 const VIEWS={dashboard:'Tableau de bord',adherents:'Base des adhérents',nouveau:'Nouvelle adhésion',archives:'Archives',projets:'Projets',projet:'Détail du projet',utilisateurs:'Agents de saisie',gestion:'Gestion de projet',gprojet:'Gestion de projet'};
 function show(name){
-  if(!user||!VIEWS[name]||((name==='projets'||name==='utilisateurs')&&!isAdmin()))return;
+  if(!user||!VIEWS[name]||(name==='projets'&&!canProjTab())||(name==='utilisateurs'&&!isAdmin()))return;
   if(name==='nouveau'&&(editId?!can('adh_modifier'):!can('adh_ajouter')))return;
   Object.keys(VIEWS).forEach(v=>$(v+'View').classList.toggle('hidden',v!==name));
   document.querySelectorAll('.nav').forEach(b=>{const on=b.dataset.view===name||(name==='gprojet'&&b.dataset.view==='gestion');b.classList.toggle('active',on);on?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current')});
@@ -569,7 +621,7 @@ async function openApp(u){
     if(error||!p||!p.is_active){await client.auth.signOut();msg('loginMessage','Accès refusé. Contactez l’administrateur.','error');return}
     user=u;profile=p;
     $('loginView').classList.add('hidden');$('appView').classList.remove('hidden');$('logout').classList.remove('hidden');$('foot').classList.remove('hidden');
-    document.querySelectorAll('.nav').forEach(b=>b.classList.remove('hidden'));document.querySelector('.nav[data-view=projets]').classList.toggle('hidden',!isAdmin());document.querySelector('.nav[data-view=utilisateurs]').classList.toggle('hidden',!isAdmin());
+    document.querySelectorAll('.nav').forEach(b=>b.classList.remove('hidden'));document.querySelector('.nav[data-view=projets]').classList.toggle('hidden',!canProjTab());document.querySelector('.nav[data-view=utilisateurs]').classList.toggle('hidden',!isAdmin());
     $('export').classList.toggle('hidden',!isAdmin());
     $('status').textContent='● Connexion sécurisée';
     const nm=p.full_name||u.email;$('userName').textContent=nm;$('userRole').textContent=isAdmin()?'Administrateur':'Agent de saisie';$('avatar').textContent=ini(nm.split(' ')[0],nm.split(' ')[1]);
@@ -585,9 +637,9 @@ async function load(){
   /* Relit les droits à chaque chargement : un changement fait par l'administrateur s'applique sans reconnexion. */
   {const {data:pp}=await client.from('profiles').select('permissions,is_active').eq('id',user.id).maybeSingle();if(pp){profile.permissions=pp.permissions||{};profile.active=pp.is_active}applyPerms()}
   /* Les données sensibles (CNI, compte bancaire) ne sont chargées que pour un administrateur. */
-  const {data:pj}=await client.from('projets').select('id,nom,actif,description,localisation,statut,date_debut,date_fin_prevue,capacite').order('nom');projets=pj||[];
+  const {data:pj}=await client.from('projets').select('id,nom,actif,description,localisation,statut,date_debut,date_fin_prevue,capacite,deleted_at').order('nom');projAll=pj||[];projets=projAll.filter(p=>!p.deleted_at);projCorb=projAll.filter(p=>p.deleted_at);
   const priv=isAdmin()?',adherent_private(cni,adresse,banque,compte_bancaire)':'';
-  const {data,error}=await client.from('adherents').select('id,prenom,nom,genre,matricule_solde,telephone,profession,frais_adhesion,apport_fcfa,option_acquisition,projet_id,photo_path,date_adhesion,created_at,created_by,archived_at'+priv).order('created_at',{ascending:false});
+  const {data,error}=await client.from('adherents').select('id,prenom,nom,genre,matricule_solde,telephone,profession,frais_adhesion,apport_fcfa,option_acquisition,projet_id,photo_path,date_adhesion,created_at,created_by,archived_at,archive_type'+priv).order('created_at',{ascending:false});
   if(error){msg('formMessage','Impossible de charger les données. Réessayez ou reconnectez-vous.','error');return}
   const all=(data||[]).map(a=>({...a,matricule:a.matricule_solde,apport:a.apport_fcfa,priv:(Array.isArray(a.adherent_private)?a.adherent_private[0]:a.adherent_private)||{}}));items=all.filter(a=>!a.archived_at);archived=all.filter(a=>a.archived_at);await loadPhotos(all);
   render();
@@ -602,15 +654,101 @@ function render(){
   const cols={Terrain:'#2d7df6',Villa:'#1fb85a',Appartement:'#ff9a2e'};
   $('repart').innerHTML=Object.keys(cols).map(k=>{const c=items.filter(a=>a.option_acquisition===k).length,p=items.length?Math.round(c*100/items.length):0;return `<li><div><span>Option ${k}</span><b>${c}</b></div><div class="bar"><i style="width:${p}%;--c:${cols[k]}"></i></div></li>`}).join('');
   $('activ').innerHTML=items.slice(0,3).map((a,i)=>`<li style="--c:${['#c04be0','#ff9a2e','#1fb85a'][i]}"><div>Nouvelle adhésion : ${esc(a.prenom)} ${esc(a.nom)}<small>${esc(ago(a.created_at))}</small></div></li>`).join('')||'<li>Aucune activité.</li>';
-  $('arcRows').innerHTML=archived.map(a=>`<tr><td><b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.option_acquisition)}</td><td>${esc(a.date_adhesion)}</td><td>${esc(new Date(a.archived_at).toLocaleDateString('fr-FR'))}</td><td class="acts">${isAdmin()?`<button class="btn mini primary" type="button" data-act="restore" data-id="${esc(a.id)}">Restaurer</button>`:'—'}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Aucun adhérent archivé.</td></tr>';
+  renderArchives();
   renderProjets();
   table();
 }
 function table(){
   const q=$('search').value.trim().toLocaleLowerCase('fr'),f=$('filter').value,fp=$('filterProj').value;
   const arr=items.filter(a=>(!f||a.option_acquisition===f)&&(!fp||a.projet_id===fp)&&[a.prenom,a.nom,a.matricule,a.telephone,a.profession,a.priv.banque].some(x=>String(x||'').toLocaleLowerCase('fr').includes(q)));
-  $('rows').innerHTML=arr.map(a=>`<tr><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.telephone)}</td><td>${esc(a.priv.banque||'—')}</td><td>${esc(a.option_acquisition)}</td><td>${esc(pn(a.projet_id))}</td><td>${money(a.frais_adhesion)}</td><td>${money(a.apport)}</td><td>${esc(a.date_adhesion)}</td><td class="acts">${(isAdmin()||a.created_by===user?.id)&&(can('adh_modifier')||can('adh_supprimer'))?(can('adh_modifier')?`<button class="btn mini light" type="button" data-act="edit" data-id="${esc(a.id)}">Modifier</button>`:'')+(can('adh_supprimer')?`<button class="btn mini danger" type="button" data-act="arch" data-id="${esc(a.id)}">Archiver</button>`:''):'—'}</td></tr>`).join('')||'<tr><td colspan="10" class="empty">Aucun résultat pour cette recherche.</td></tr>';
+  $('rows').innerHTML=arr.map(a=>`<tr><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.telephone)}</td><td>${esc(a.priv.banque||'—')}</td><td>${esc(a.option_acquisition)}</td><td>${esc(pn(a.projet_id))}</td><td>${money(a.frais_adhesion)}</td><td>${money(a.apport)}</td><td>${esc(a.date_adhesion)}</td><td class="acts">${(isAdmin()||a.created_by===user?.id)&&(can('adh_modifier')||can('adh_supprimer'))?(can('adh_modifier')?`<button class="btn mini light" type="button" data-act="edit" data-id="${esc(a.id)}">Modifier</button>`:'')+(can('adh_supprimer')?`<button class="btn mini danger" type="button" data-act="arch" data-id="${esc(a.id)}">Supprimer</button>`:''):'—'}</td></tr>`).join('')||'<tr><td colspan="10" class="empty">Aucun résultat pour cette recherche.</td></tr>';
 }
+const arcYearOf=a=>String(a.date_adhesion||'').slice(0,4)||'—';
+function renderArchives(){
+  const hist=archived.filter(a=>a.archive_type==='historique'),corb=archived.filter(a=>a.archive_type!=='historique');
+  $('arcHistN').textContent=hist.length?'('+hist.length+')':'';
+  const nc=corb.length+projCorb.length;$('arcCorbN').textContent=nc?'('+nc+')':'';
+  const years=[...new Set(hist.map(arcYearOf))].sort((a,b)=>b.localeCompare(a));
+  if(!years.includes(arcYear))arcYear=years[0]||null;
+  $('arcYears').innerHTML=years.map(y=>{const n=hist.filter(a=>arcYearOf(a)===y).length;return `<button type="button" class="ychip${y===arcYear?' on':''}" data-year="${esc(y)}">${esc(y)}<small>${n} adhérent${n>1?'s':''}</small></button>`}).join('')||'<div class="empty" style="width:100%">Aucune archive pour le moment.'+(can('adh_archiver')?' Cliquez sur « ➕ Ajouter un ancien adhérent ».':'')+'</div>';
+  const q=$('arcSearch').value.trim().toLocaleLowerCase('fr');
+  const acts=a=>(can('adh_restaurer')?`<button class="btn mini primary" type="button" data-act="restore" data-id="${esc(a.id)}">Restaurer</button>`:'')+(can('adh_supprimer_def')?`<button class="btn mini danger" type="button" data-act="purge" data-id="${esc(a.id)}">Supprimer définitivement</button>`:'')||'—';
+  const rh=hist.filter(a=>arcYearOf(a)===arcYear&&[a.prenom,a.nom,a.matricule,a.telephone].some(x=>String(x||'').toLocaleLowerCase('fr').includes(q)));
+  $('arcHRows').innerHTML=arcYear?(rh.map(a=>`<tr><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.telephone||'—')}</td><td>${esc(a.option_acquisition)}</td><td>${esc(pn(a.projet_id))}</td><td>${money(a.frais_adhesion)}</td><td>${money(a.apport)}</td><td>${esc(a.date_adhesion)}</td><td class="acts">${acts(a)}</td></tr>`).join('')||'<tr><td colspan="9" class="empty">Aucun résultat pour cette recherche.</td></tr>'):'<tr><td colspan="9" class="empty">Aucune archive.</td></tr>';
+  $('arcRows').innerHTML=corb.map(a=>`<tr><td>${av(a)}<b>${esc(a.prenom)} ${esc(a.nom)}</b></td><td>${esc(a.matricule)}</td><td>${esc(a.option_acquisition)}</td><td>${esc(a.date_adhesion)}</td><td>${esc(new Date(a.archived_at).toLocaleDateString('fr-FR'))}</td><td class="acts">${acts(a)}</td></tr>`).join('')||'<tr><td colspan="6" class="empty">Aucun adhérent dans la corbeille.</td></tr>';
+  const pacts=p=>(can('proj_restaurer')?`<button class="btn mini primary" type="button" data-pact="restore" data-pid="${esc(p.id)}">Restaurer</button>`:'')+(can('proj_supprimer_def')?`<button class="btn mini danger" type="button" data-pact="purge" data-pid="${esc(p.id)}">Supprimer définitivement</button>`:'')||'—';
+  $('pcRows').innerHTML=projCorb.map(p=>`<tr><td><b>${esc(p.nom)}</b></td><td>${esc(p.localisation||'—')}</td><td>${esc(new Date(p.deleted_at).toLocaleDateString('fr-FR'))}</td><td class="acts">${pacts(p)}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Aucun projet dans la corbeille.</td></tr>';
+}
+function arcShowTab(t){document.querySelectorAll('.arctab').forEach(b=>{const on=b.dataset.arctab===t;b.classList.toggle('active',on);b.setAttribute('aria-selected',on)});$('arcHistPane').classList.toggle('hidden',t!=='hist');$('arcCorbPane').classList.toggle('hidden',t!=='corb')}
+document.querySelectorAll('.arctab').forEach(b=>b.onclick=()=>arcShowTab(b.dataset.arctab));
+$('arcYears').onclick=e=>{const b=e.target.closest('[data-year]');if(b){arcYear=b.dataset.year;renderArchives()}};
+$('arcSearch').oninput=renderArchives;
+async function arcAction(act,id,box){
+  const a=archived.find(x=>String(x.id)===id);if(!a||!user)return;
+  const nom=a.prenom+' '+a.nom;
+  if(act==='restore'){
+    if(!can('adh_restaurer'))return msg(box,DENY,'error');
+    if(!confirm('Restaurer '+nom+' ?\nLe dossier reviendra dans la liste des adhérents.'))return;
+    msg(box,'Traitement…');const {error}=await client.rpc('cohag_restaurer_adherent',{p_id:id});
+    if(error)return msg(box,rpcErr(error,'Restauration impossible.'),'error');
+    await load();msg(box,nom+' a été restauré dans la liste des adhérents.','success');
+  }else if(act==='purge'){
+    if(!can('adh_supprimer_def'))return msg(box,DENY,'error');
+    const t=prompt('SUPPRESSION DÉFINITIVE de '+nom+'.\nToutes ses informations (CNI, banque, photo…) seront effacées sans retour possible.\n\nPour confirmer, tapez : SUPPRIMER');
+    if(t===null)return;
+    if(t.trim().toUpperCase()!=='SUPPRIMER')return msg(box,'Suppression annulée : le mot de confirmation est incorrect.','error');
+    msg(box,'Suppression…');const {data:ph,error}=await client.rpc('cohag_supprimer_definitivement',{p_id:id});
+    if(error)return msg(box,rpcErr(error,'Suppression impossible.'),'error');
+    if(ph){try{await client.storage.from('photos').remove([ph])}catch(_){}}
+    await load();msg(box,nom+' a été supprimé définitivement.','success');
+  }
+}
+$('arcRows').onclick=e=>{const b=e.target.closest('button[data-act]');if(b)arcAction(b.dataset.act,b.dataset.id,'arcMessage')};
+$('arcHRows').onclick=e=>{const b=e.target.closest('button[data-act]');if(b)arcAction(b.dataset.act,b.dataset.id,'arcHMessage')};
+$('pcRows').onclick=async e=>{
+  const b=e.target.closest('button[data-pact]');if(!b||!user)return;
+  const p=projCorb.find(x=>x.id===b.dataset.pid);if(!p)return;
+  if(b.dataset.pact==='restore'){
+    if(!can('proj_restaurer'))return msg('pcMessage',DENY,'error');
+    if(!confirm('Restaurer le projet « '+p.nom+' » ?'))return;
+    msg('pcMessage','Traitement…');const {error}=await client.rpc('cohag_projet_restaurer',{p_id:p.id});
+    if(error)return msg('pcMessage',rpcErr(error,'Restauration impossible.'),'error');
+    await load();msg('pcMessage','Projet « '+p.nom+' » restauré.','success');
+  }else{
+    if(!can('proj_supprimer_def'))return msg('pcMessage',DENY,'error');
+    const t=prompt('SUPPRESSION DÉFINITIVE du projet « '+p.nom+' ».\nCette action est irréversible.\n\nPour confirmer, tapez : SUPPRIMER');
+    if(t===null)return;
+    if(t.trim().toUpperCase()!=='SUPPRIMER')return msg('pcMessage','Suppression annulée : le mot de confirmation est incorrect.','error');
+    msg('pcMessage','Suppression…');const {error}=await client.rpc('cohag_projet_supprimer_definitivement',{p_id:p.id});
+    if(error)return msg('pcMessage',rpcErr(error,'Suppression impossible.'),'error');
+    await load();msg('pcMessage','Projet « '+p.nom+' » supprimé définitivement.','success');
+  }
+};
+/* Saisie d'anciens adhérents directement dans les archives */
+$('arcAddBtn').onclick=()=>{
+  if(!can('adh_archiver'))return msg('arcHMessage',DENY,'error');
+  $('a_proj').innerHTML='<option value="">Non renseigné</option>'+projets.map(p=>`<option value="${esc(p.id)}">${esc(p.nom)}</option>`).join('');
+  $('arcForm').reset();$('a_date').max=new Date().toISOString().slice(0,10);msg('arcFMessage','');
+  $('arcFormPanel').classList.remove('hidden');$('arcFormPanel').scrollIntoView({behavior:'smooth',block:'start'});$('a_prenom').focus();
+};
+$('arcCancel').onclick=()=>{$('arcForm').reset();msg('arcFMessage','');$('arcFormPanel').classList.add('hidden')};
+$('arcForm').onsubmit=async e=>{
+  e.preventDefault();const f=e.currentTarget;if(!user||!f.reportValidity())return;
+  if(!can('adh_archiver'))return msg('arcFMessage',DENY,'error');
+  const g=k=>String(f.elements[k].value||'').trim(),d=g('date_adhesion'),apport=Number(g('apport')||0);
+  if(d>new Date().toISOString().slice(0,10))return msg('arcFMessage','La date d’adhésion ne peut pas être dans le futur.','error');
+  if(!Number.isInteger(apport)||apport<0)return msg('arcFMessage','Apport invalide.','error');
+  const now=new Date().toISOString();
+  const rec={prenom:g('prenom'),nom:g('nom'),genre:g('genre'),matricule_solde:g('matricule'),telephone:g('telephone')||null,profession:g('profession')||null,frais_adhesion:Number(g('frais_adhesion')),apport_fcfa:apport,option_acquisition:g('option_acquisition'),projet_id:g('projet')||null,date_adhesion:d,created_by:user.id,updated_by:user.id,archived_at:now,archived_by:user.id,archive_type:'historique'};
+  $('arcSave').disabled=true;msg('arcFMessage','Enregistrement…');
+  const {error}=await client.from('adherents').insert(rec);
+  $('arcSave').disabled=false;
+  if(error){console.error('archive ajout',error);return msg('arcFMessage',denied(error)?DENY:error.code==='23505'?'Ce matricule est déjà enregistré (dans la liste ou dans les archives).':error.code==='23502'?'Un champ est obligatoire dans la base : complétez téléphone et profession, puis réessayez.':error.code==='PGRST204'||error.code==='42703'?'Exécutez d’abord le script « cohag_archives_corbeille.sql » dans Supabase.':'Enregistrement impossible. Vérifiez les champs. (code '+(error.code||'?')+')','error')}
+  const y=d.slice(0,4),nm=rec.prenom+' '+rec.nom;
+  f.reset();$('a_date').max=new Date().toISOString().slice(0,10);
+  await load();arcYear=y;renderArchives();
+  msg('arcFMessage',nm+' a été ajouté aux archives '+y+'. Vous pouvez saisir le suivant.','success');$('a_prenom').focus();
+};
 function fillProjets(sel){
   const el=$('f_proj'),cur=sel!==undefined?sel:el.value;
   el.innerHTML='<option value="">'+(projets.some(p=>p.actif)?'Choisir…':'Aucun projet disponible')+'</option>'+projets.filter(p=>p.actif||p.id===cur).map(p=>`<option value="${esc(p.id)}">${esc(p.nom)}</option>`).join('');
@@ -623,7 +761,7 @@ function renderProjets(){
   const none=items.filter(a=>!a.projet_id).length;if(none)rows.push({n:'Non renseigné',c:none,col:'#9aa7c0'});
   $('parProjet').innerHTML=rows.map(r=>`<li><div><span>${esc(r.n)}</span><b>${r.c}</b></div><div class="bar"><i style="width:${tot?Math.round(r.c*100/tot):0}%;--c:${r.col}"></i></div></li>`).join('')||'<li>Aucun projet pour le moment.</li>';
   const by=(m,o)=>m.filter(a=>a.option_acquisition===o).length;
-  $('projRows').innerHTML=projets.map(p=>`<tr><td><b>${esc(p.nom)}</b><br><small>${esc(ST[p.statut]||'')}${p.localisation?' · '+esc(p.localisation):''}</small></td><td>${items.filter(a=>a.projet_id===p.id).length}</td><td>${p.actif?'Actif':'Désactivé'}</td><td class="acts"><button class="btn mini light" type="button" data-act="edit" data-pid="${esc(p.id)}">Modifier</button><button class="btn mini ${p.actif?'danger':'primary'}" type="button" data-pid="${esc(p.id)}">${p.actif?'Désactiver':'Activer'}</button></td></tr>`).join('')||'<tr><td colspan="4" class="empty">Aucun projet. Ajoutez le premier ci-dessus.</td></tr>';
+  $('projRows').innerHTML=projets.map(p=>`<tr><td><b>${esc(p.nom)}</b><br><small>${esc(ST[p.statut]||'')}${p.localisation?' · '+esc(p.localisation):''}</small></td><td>${items.filter(a=>a.projet_id===p.id).length}</td><td>${p.actif?'Actif':'Désactivé'}</td><td class="acts">${(isAdmin()?`<button class="btn mini light" type="button" data-act="edit" data-pid="${esc(p.id)}">Modifier</button><button class="btn mini ${p.actif?'light':'primary'}" type="button" data-pid="${esc(p.id)}">${p.actif?'Désactiver':'Activer'}</button>`:'')+(can('proj_supprimer')?`<button class="btn mini danger" type="button" data-act="del" data-pid="${esc(p.id)}">Supprimer</button>`:'')||'—'}</td></tr>`).join('')||'<tr><td colspan="4" class="empty">Aucun projet. Ajoutez le premier ci-dessus.</td></tr>';
   $('projCards').innerHTML=projets.filter(p=>p.actif||items.some(a=>a.projet_id===p.id)).map(p=>{const m=items.filter(a=>a.projet_id===p.id),cap=p.capacite||0,tx=cap?Math.min(100,Math.round(m.length*100/cap)):0;return `<button class="pcard" type="button" data-open="${esc(p.id)}"><span class="badge ${esc(p.statut||'')}">${esc(ST[p.statut]||'—')}</span><b>${esc(p.nom)}</b><small>${esc(p.localisation||'Localisation non précisée')}</small><div class="bar"><i style="width:${tx}%;--c:#2d7df6"></i></div><small>${m.length} adhérent${m.length>1?'s':''}${cap?' sur '+cap+' places':''}</small><small>Terrain ${by(m,'Terrain')} · Villa ${by(m,'Villa')} · Appart. ${by(m,'Appartement')}</small></button>`}).join('')||'<div class="empty">Aucun projet pour le moment. Un administrateur peut en créer dans l’onglet Projets.</div>';
   const fp=$('filterProj'),cv=fp.value;fp.innerHTML='<option value="">Tous les projets</option>'+projets.map(p=>`<option value="${esc(p.id)}">${esc(p.nom)}</option>`).join('');fp.value=cv;
   if(curProjet)renderProjet();
@@ -640,8 +778,19 @@ $('projForm').onsubmit=async e=>{
 };
 $('projForm').addEventListener('reset',()=>{projEdit=null;$('projSave').textContent='Ajouter le projet'});
 $('projRows').onclick=async e=>{
-  const b=e.target.closest('button[data-pid]');if(!b||!user||!isAdmin())return;
+  const b=e.target.closest('button[data-pid]');if(!b||!user)return;
   const p=projets.find(x=>x.id===b.dataset.pid);if(!p)return;
+  if(b.dataset.act==='del'){
+    if(!can('proj_supprimer'))return msg('projMessage',DENY,'error');
+    const na=items.filter(a=>a.projet_id===p.id).length,nr=archived.filter(a=>a.projet_id===p.id).length;
+    if(na+nr)return msg('projMessage','Impossible de supprimer « '+p.nom+' » : ce projet a encore '+(na+nr)+' adhérent(s) rattaché(s) ('+na+' actif(s), '+nr+' archivé(s)). Détachez-les d’abord.','error');
+    if(!confirm('Mettre le projet « '+p.nom+' » à la corbeille ?\nIl pourra être restauré depuis Archives › Corbeille.'))return;
+    msg('projMessage','Traitement…');const {error}=await client.rpc('cohag_projet_corbeille',{p_id:p.id});
+    if(error)return msg('projMessage',rpcErr(error,'Suppression impossible.'),'error');
+    if(projEdit===p.id)$('projForm').reset();
+    await load();msg('projMessage','Projet « '+p.nom+' » mis à la corbeille. Retrouvez-le dans Archives › Corbeille.','success');return;
+  }
+  if(!isAdmin())return;
   if(b.dataset.act==='edit'){const f=$('projForm').elements;['nom','localisation','statut','date_debut','date_fin_prevue','capacite','description'].forEach(k=>f[k].value=p[k]==null?'':String(p[k]));projEdit=p.id;$('projSave').textContent='Enregistrer les modifications';msg('projMessage','Modification de « '+p.nom+' ».');f.nom.focus();return}
   const {data:d,error}=await client.from('projets').update({actif:!p.actif}).eq('id',p.id).select('id');
   if(error||!d||!d.length){msg('projMessage','Action impossible.','error');return}
@@ -704,7 +853,7 @@ async function setArchive(id,on,box){
   const {data:ad,error}=await client.from('adherents').update(patch).eq('id',id).select('id');
   if(!error&&(!ad||!ad.length)){msg(box,'Action refusée : vous ne pouvez agir que sur les dossiers que vous avez créés.','error');return}
   if(error){console.error('archive',error);msg(box,denied(error)?DENY:'Action impossible. Vérifiez vos droits ou réessayez. (code '+(error.code||'?')+')','error');return}
-  await load();msg(box,on?'Adhérent archivé. Vous pouvez le retrouver dans « Archives ».':'Adhérent restauré.','success');
+  await load();msg(box,on?'Adhérent mis à la corbeille. Vous pouvez le retrouver dans « Archives › Corbeille ».':'Adhérent restauré.','success');
 }
 $('adhForm').addEventListener('reset',()=>{photoBlob=null;editPhoto=null;$('photoPrev').classList.add('hidden');editId=null;setMode(false);msg('formMessage','')});
 $('rows').onclick=e=>{
@@ -712,11 +861,7 @@ $('rows').onclick=e=>{
   const a=items.find(x=>String(x.id)===b.dataset.id);if(!a)return;
   if(b.dataset.act==='edit'){if(can('adh_modifier'))startEdit(a);else msg('listMessage',DENY,'error')}
   else if(!can('adh_supprimer'))msg('listMessage',DENY,'error');
-  else if(confirm('Archiver '+a.prenom+' '+a.nom+' ?\nLe dossier sera retiré de la liste mais pourra être restauré par un administrateur.'))setArchive(a.id,true,'listMessage');
-};
-$('arcRows').onclick=e=>{
-  const b=e.target.closest('button[data-act="restore"]');if(!b||!user||!isAdmin())return;
-  if(confirm('Restaurer cet adhérent ?'))setArchive(b.dataset.id,false,'arcMessage');
+  else if(confirm('Supprimer '+a.prenom+' '+a.nom+' de la liste ?\nLe dossier ira dans Archives › Corbeille, d’où il pourra être restauré.'))setArchive(a.id,true,'listMessage');
 };
 $('search').oninput=table;$('filter').onchange=table;$('filterProj').onchange=table;$('print').onclick=()=>window.print();
 
@@ -770,7 +915,7 @@ $('adhForm').onsubmit=async e=>{
 function resetUI(text){
   pollStop();lockHide();$('lockBanner').classList.add('hidden');$('toasts').innerHTML='';
   user=null;profile=null;items=[];projets=[];curProjet=null;photoUrls={};archived=[];editId=null;clearTimeout(idleT);
-  ['rows','recentRows','arcRows','projRows','parProjet','projCards','pdRows','usrRows'].forEach(i=>$(i).innerHTML='');
+  ['rows','recentRows','arcRows','arcHRows','pcRows','arcYears','projRows','parProjet','projCards','pdRows','usrRows'].forEach(i=>$(i).innerHTML='');projAll=[];projCorb=[];arcYear=null;$('arcFormPanel').classList.add('hidden');arcShowTab('hist');
   $('adhForm').reset();$('search').value='';$('filter').value='';
   $('appView').classList.add('hidden');$('loginView').classList.remove('hidden');$('logout').classList.add('hidden');
   document.querySelectorAll('.nav').forEach(b=>b.classList.add('hidden'));
@@ -788,7 +933,7 @@ async function usrCall(body){const {data,error}=await client.functions.invoke('g
 function permBox(u,perms){
   if(u.role==='admin')return '<span class="muted">Tous les droits</span>';
   const p=perms[u.id]||{},cb=k=>`<label><input type="checkbox" data-perm="${k}" data-puid="${esc(u.id)}"${p[k]===true?' checked':''}>${PERMS[k]}</label>`;
-  return `<div class="perm"><div><b>ADHÉRENTS</b>${cb('adh_ajouter')}${cb('adh_modifier')}${cb('adh_supprimer')}</div><div><b>GESTION DE PROJET</b>${cb('gp_ajouter')}${cb('gp_modifier')}${cb('gp_supprimer')}</div></div>`;
+  return '<div class="perm">'+PERM_GROUPS.map(([t,ks])=>`<div><b>${t}</b>${ks.map(cb).join('')}</div>`).join('')+'</div>';
 }
 async function usrLoad(){
   try{const d=await usrCall({action:'list'});
@@ -1384,7 +1529,7 @@ function asCard(r,i){
     <div class="askv">${asKV('Projet',o.proj)}${asKV('Page',lab)}${asKV('N°',o.numero??'—')}${asKV('Téléphone',o.telephone)}${asKV('Date d’arrivée',dt)}${asKV('N° parcelle',o.n_parcelle)}${o.superficie!=null?asKV('Superficie',gpNf(o.superficie)+' m²'):''}${asKV(o.page==='attestation'?'Attestation':'Total versé',money(o.mt))}${o.page!=='attestation'?asKV('Nombre d’acomptes',o.nb):''}</div>
     <div class="asact"><button class="btn mini primary" type="button" data-asgp="${esc(o.projet_id)}" data-asl="${esc(o.id)}">Ouvrir la fiche</button></div></div>`;
   }
-  const p=o.permissions||{},dr=o.role==='admin'?'Tous les droits':Object.keys(PERMS).filter(k=>p[k]===true).map(k=>(k.startsWith('adh')?'Adhérents : ':'Gestion : ')+PERMS[k]).join(', ')||'Lecture seule';
+  const p=o.permissions||{},dr=o.role==='admin'?'Tous les droits':Object.keys(PERMS).filter(k=>p[k]===true).map(k=>permGroup(k)+' : '+PERMS[k]).join(', ')||'Lecture seule';
   return `<div class="ascard"><div class="ashead"><span class="avs" style="background:linear-gradient(135deg,#0b1f55,#2746c7)">${esc(ini((o.full_name||'?').split(' ')[0],(o.full_name||'').split(' ')[1]))}</span><div><b>${esc(o.full_name||'—')}</b><small>🔑 Compte ${o.role==='admin'?'administrateur':'agent de saisie'} · ${asPct(r.s)}</small></div></div>
   <div class="askv">${asKV('E-mail',o.email)}${asKV('Statut',o.is_active?'Actif':'Désactivé')}<div style="grid-column:1/-1"><small>Droits</small><b>${esc(dr)}</b></div></div>
   <div class="asact"><button class="btn mini primary" type="button" data-asgo="utilisateurs">Gérer ses droits</button></div></div>`;
@@ -1401,13 +1546,16 @@ const asDroit=k=>can(k)?'<div class="asr ok">✅ Votre compte a ce droit.</div>'
 const asAdm=()=>isAdmin()?'':'<div class="asr no">⛔ Réservé aux administrateurs.</div>';
 const asSteps=a=>'<ol class="assteps">'+a.map(x=>'<li>'+x+'</li>').join('')+'</ol>';
 const AS_TOPICS=[
- {id:'droits',t:'Quels sont mes droits ?',k:'mes droits|mon compte|ce que je peux faire|autorise|permission|lecture seule|role',a:()=>{const l=Object.keys(PERMS).map(k=>`<li>${can(k)?'✅':'⛔'} ${k.startsWith('adh')?'Adhérents':'Gestion de projet'} : ${PERMS[k]}</li>`).join('');return isAdmin()?'Vous êtes <b>administrateur</b> : vous avez tous les droits, y compris Projets, Agents de saisie, Archives (restaurer) et l’export CSV.':`Vous êtes <b>agent de saisie</b>. Vos droits actuels :<ul class="assteps">${l}</ul>Sans droit coché, vous êtes en <b>lecture seule</b> : vous pouvez consulter, rechercher et imprimer. Pour obtenir un droit, demandez à l’administrateur.`}},
+ {id:'droits',t:'Quels sont mes droits ?',k:'mes droits|mon compte|ce que je peux faire|autorise|permission|lecture seule|role',a:()=>{const l=Object.keys(PERMS).map(k=>`<li>${can(k)?'✅':'⛔'} ${permGroup(k)} : ${PERMS[k]}</li>`).join('');return isAdmin()?'Vous êtes <b>administrateur</b> : vous avez tous les droits, y compris Projets, Agents de saisie, Archives (restaurer) et l’export CSV.':`Vous êtes <b>agent de saisie</b>. Vos droits actuels :<ul class="assteps">${l}</ul>Sans droit coché, vous êtes en <b>lecture seule</b> : vous pouvez consulter, rechercher et imprimer. Pour obtenir un droit, demandez à l’administrateur.`}},
  {id:'ajout_adh',t:'Comment enregistrer une nouvelle adhésion ?',k:'nouvelle adhesion|ajouter un adherent|enregistrer un adherent|inscrire|inscription|nouvel adherent|ajouter adhesion|creer un dossier|saisir une adhesion',go:'nouveau',need:'adh_ajouter',a:()=>asDroit('adh_ajouter')+asSteps(['Cliquez sur <b>➕ Nouvelle adhésion</b> dans le menu.','Ajoutez la <b>photo d’identité</b> (JPG, PNG ou WebP, 8 Mo maximum).','Remplissez tous les champs marqués * : prénom, nom, genre, matricule de solde, n° CNI, téléphone, adresse, profession, banque, n° de compte.','Choisissez les <b>frais d’adhésion</b> (26 000 ou 250 000 FCFA), saisissez l’<b>apport</b>, l’<b>option</b> (Villa, Terrain, Appartement) et le <b>projet</b>.','Indiquez la <b>date d’adhésion</b> (elle ne peut pas être dans le futur), puis cliquez sur <b>Enregistrer l’adhésion</b>.'])+'💡 Un même matricule ou n° CNI ne peut être enregistré qu’une seule fois.'},
  {id:'modif_adh',t:'Comment modifier un dossier d’adhérent ?',k:'modifier un adherent|modifier un dossier|corriger un adherent|changer le telephone|erreur de saisie adherent|mettre a jour un adherent|modifier adhesion|corriger une erreur',go:'adherents',need:'adh_modifier',a:()=>asDroit('adh_modifier')+asSteps(['Ouvrez <b>👥 Adhérents</b> et recherchez la personne.','Cliquez sur <b>Modifier</b> au bout de sa ligne.','Corrigez les champs puis cliquez sur <b>Enregistrer les modifications</b>.'])+(isAdmin()?'':'⚠️ Un agent ne peut modifier <b>que les dossiers qu’il a lui-même créés</b>. Les informations sensibles (CNI, adresse, banque, n° de compte) ne sont modifiables que par un administrateur.')},
- {id:'arch',t:'Comment archiver (retirer) un adhérent ?',k:'archiver|supprimer un adherent|retirer un adherent|effacer un adherent|enlever un adherent',go:'adherents',need:'adh_supprimer',a:()=>asDroit('adh_supprimer')+asSteps(['Ouvrez <b>👥 Adhérents</b> et trouvez la personne.','Cliquez sur <b>Archiver</b>, puis confirmez.'])+'Le dossier n’est pas effacé : il passe dans <b>🗄️ Archives</b>. Seul un administrateur peut le restaurer.'+(isAdmin()?'':' Un agent ne peut archiver que les dossiers qu’il a créés.')},
- {id:'restaurer',t:'Comment restaurer un adhérent archivé ?',k:'restaurer|desarchiver|recuperer un adherent|remettre un adherent|archives',go:'archives',a:()=>asAdm()+asSteps(['Ouvrez <b>🗄️ Archives</b>.','Cliquez sur <b>Restaurer</b> sur la ligne de l’adhérent et confirmez.'])+'Le dossier revient aussitôt dans la liste des adhérents.'},
+ {id:'arch',t:'Comment supprimer (mettre à la corbeille) un adhérent ?',k:'archiver|supprimer un adherent|retirer un adherent|effacer un adherent|enlever un adherent|corbeille',go:'adherents',need:'adh_supprimer',a:()=>asDroit('adh_supprimer')+asSteps(['Ouvrez <b>👥 Adhérents</b> et trouvez la personne.','Cliquez sur <b>Supprimer</b>, puis confirmez.'])+'Le dossier n’est pas effacé : il passe dans <b>🗄️ Archives › 🗑️ Corbeille</b>, d’où il peut être restauré.'+(isAdmin()?'':' Un agent ne peut supprimer que les dossiers qu’il a créés.')},
+ {id:'restaurer',t:'Comment restaurer un adhérent ?',k:'restaurer|desarchiver|recuperer un adherent|remettre un adherent',go:'archives',need:'adh_restaurer',a:()=>asDroit('adh_restaurer')+asSteps(['Ouvrez <b>🗄️ Archives</b>, onglet <b>🗑️ Corbeille</b> (ou <b>📚 Archives par année</b>).','Cliquez sur <b>Restaurer</b> sur la ligne de l’adhérent et confirmez.'])+'Le dossier revient aussitôt dans la liste des adhérents.'},
+ {id:'arc_annee',t:'Comment saisir un ancien adhérent dans les archives ?',k:'archives par annee|ancien adherent|saisir une archive|ajouter aux archives|archive d adhesion|annee d adhesion',go:'archives',need:'adh_archiver',a:()=>asDroit('adh_archiver')+asSteps(['Ouvrez <b>🗄️ Archives</b>, onglet <b>📚 Archives par année</b>.','Cliquez sur <b>➕ Ajouter un ancien adhérent</b>.','Remplissez la fiche avec sa <b>date d’adhésion</b>, puis <b>Enregistrer dans les archives</b>.'])+'Il est rangé automatiquement dans l’année de sa date d’adhésion. Cliquez sur une année pour voir ses adhérents.'},
+ {id:'suppr_def',t:'Comment supprimer définitivement un adhérent ou un projet ?',k:'supprimer definitivement|suppression definitive|vider la corbeille|effacer definitivement',go:'archives',a:()=>`Adhérents : ${can('adh_supprimer_def')?'✅':'⛔'} · Projets : ${can('proj_supprimer_def')?'✅':'⛔'}`+asSteps(['Ouvrez <b>🗄️ Archives</b>, onglet <b>🗑️ Corbeille</b>.','Cliquez sur <b>Supprimer définitivement</b>.','Tapez <b>SUPPRIMER</b> pour confirmer.'])+'⚠️ C’est irréversible : toutes les informations sont effacées.'},
+ {id:'proj_suppr',t:'Comment supprimer un projet (onglet Projets) ?',k:'supprimer un projet|effacer un projet|projet a la corbeille|restaurer un projet',go:'projets',need:'proj_supprimer',a:()=>asDroit('proj_supprimer')+asSteps(['Ouvrez <b>🏗️ Projets</b>.','Cliquez sur <b>Supprimer</b> sur la ligne du projet et confirmez.'])+'Le projet va dans <b>🗄️ Archives › 🗑️ Corbeille</b> (restaurable). ⚠️ Un projet qui a encore des adhérents (actifs ou archivés) ne peut pas être supprimé.'},
  {id:'cherche',t:'Comment retrouver un adhérent dans la liste ?',k:'rechercher un adherent|retrouver un adherent|liste des adherents|filtrer|filtre|trouver un dossier|chercher dans la liste',go:'adherents',a:()=>asSteps(['Ouvrez <b>👥 Adhérents</b>.','Tapez dans la barre de recherche : nom, prénom, matricule, téléphone ou profession.','Affinez avec les filtres <b>Option</b> et <b>Projet</b>.'])+'💡 Plus simple : tapez directement le nom, le téléphone ou le matricule ici, dans l’assistant. Il trouve même les noms mal orthographiés (ex. « Ndiay » trouve « NDIAYE »).'},
- {id:'doublon',t:'« Ce matricule ou ce n° de CNI est déjà enregistré »',k:'deja enregistre|deja utilise|doublon|matricule existe|cni existe|23505',a:()=>'Ce message signifie qu’un dossier existe déjà avec ce <b>matricule de solde</b> ou ce <b>n° CNI</b>, peut-être aux Archives.'+asSteps(['Tapez le matricule ici, dans l’assistant, pour retrouver le dossier existant (même archivé).','S’il s’agit de la même personne, modifiez le dossier existant au lieu d’en créer un nouveau.','S’il est archivé, demandez à un administrateur de le restaurer.'])},
+ {id:'doublon',t:'« Ce matricule ou ce n° de CNI est déjà enregistré »',k:'deja enregistre|deja utilise|doublon|matricule existe|cni existe|23505',a:()=>'Ce message signifie qu’un dossier existe déjà avec ce <b>matricule de solde</b> ou ce <b>n° CNI</b>, peut-être aux Archives.'+asSteps(['Tapez le matricule ici, dans l’assistant, pour retrouver le dossier existant (même archivé).','S’il s’agit de la même personne, modifiez le dossier existant au lieu d’en créer un nouveau.','S’il est dans les archives ou la corbeille, demandez à un compte ayant le droit « Restaurer » de le restaurer.'])},
  {id:'photo',t:'La photo est refusée',k:'photo|image refusee|photo refusee|photo identite|envoi de la photo',a:()=>'La photo doit être au format <b>JPG, PNG ou WebP</b> et peser <b>moins de 8 Mo</b>. Elle est automatiquement réduite et nettoyée avant l’envoi.'+asSteps(['Prenez la photo avec le téléphone ou scannez-la.','Si elle est au format HEIC (iPhone) ou PDF, convertissez-la en JPG.','Si « Envoi de la photo impossible » s’affiche, vérifiez la connexion Internet et réessayez.'])},
  {id:'refus',t:'« Action non autorisée pour votre compte »',k:'action non autorisee|non autorise|refuse|je ne peux pas|bouton absent|pas de bouton|pourquoi je ne vois pas|impossible de modifier|impossible d ajouter|impossible de supprimer|42501',a:()=>'Les boutons s’affichent selon vos droits, et la base de données refuse de toute façon les actions non autorisées. '+AS_TOPICS[0].a()+'<br>Rappel : un agent ne peut modifier ou archiver <b>que les adhérents qu’il a lui-même enregistrés</b>.'},
  {id:'export',t:'Comment exporter ou imprimer la liste ?',k:'exporter|export|csv|excel|imprimer|impression|telecharger la liste',go:'adherents',a:()=>asSteps(['Ouvrez <b>👥 Adhérents</b> (filtrez si besoin).','<b>Imprimer</b> : imprime la liste affichée.',isAdmin()?'<b>Exporter CSV</b> : télécharge un fichier ouvrable dans Excel, avec toutes les informations.':'<b>Exporter CSV</b> est réservé aux administrateurs.'])+'Dans <b>Gestion de projet</b>, chaque page a aussi ses boutons <b>Exporter CSV</b> et <b>Imprimer</b>.'},
@@ -1427,7 +1575,7 @@ const AS_TOPICS=[
  {id:'gp_param',t:'Comment modifier ou supprimer un projet de gestion ?',k:'parametres du projet|renommer le projet|supprimer le projet|modifier le projet de gestion|creer un projet de gestion',go:'gestion',a:()=>`<b>Créer</b> : formulaire « Ajouter un projet » en bas de la page Gestion de projet (droit Ajouter). ${can('gp_ajouter')?'✅':'⛔'}<br><b>Paramètres</b> (nom, localisation, prix au m²) : bouton <b>⚙ Paramètres</b> dans le projet (droit Modifier). ${can('gp_modifier')?'✅':'⛔'}<br><b>Supprimer</b> : bouton <b>Supprimer le projet</b>, puis tapez son nom pour confirmer (droit Supprimer). ${can('gp_supprimer')?'✅':'⛔'}<br>⚠️ Supprimer un projet efface définitivement toutes ses personnes et tous ses acomptes.`},
  {id:'histo',t:'Où voir qui a modifié quoi ?',k:'historique|qui a modifie|journal|dernieres modifications|trace|qui a supprime|qui a ajoute',go:'gestion',a:()=>'Chaque ajout, modification ou suppression dans la Gestion de projet est enregistré automatiquement, avec le nom de l’agent, la date et l’heure. Ce journal n’est pas modifiable.'+asSteps(['<b>Tous les projets</b> : panneau « 🕘 Dernières modifications » de la page Gestion de projet.','<b>Un projet</b> : panneau « Historique de ce projet » sur son Accueil.','Filtrez par agent avec la liste déroulante.'])+'Les notifications en bas à droite signalent les modifications faites par les autres.'},
  {id:'verrou',t:'L’écran « Accès momentanément verrouillé » s’affiche',k:'verrouille|verrouillage|bloque|acces bloque|acces d urgence|demande d acces|plateforme verrouillee|deverrouiller',a:()=>isAdmin()?asSteps(['Ouvrez <b>🔑 Agents de saisie</b>.','Le grand bouton <b>Verrouiller / Déverrouiller tous les comptes</b> bloque ou rouvre l’accès de tous les agents (les administrateurs gardent l’accès).','Les demandes d’accès d’urgence apparaissent dessous : <b>✅ Accorder l’accès</b> ou <b>Refuser</b>. L’agent est débloqué dans les 15 secondes.']):'L’administrateur a verrouillé les comptes agents.'+asSteps(['Sur l’écran de verrouillage, écrivez le motif (ex. « versement à enregistrer aujourd’hui »).','Cliquez sur <b>🚨 Demander l’accès d’urgence</b>.','La page se débloque toute seule dès que l’administrateur accepte.'])},
- {id:'agents',t:'Comment créer un agent et lui donner des droits ?',k:'creer un agent|nouvel agent|ajouter un agent|donner des droits|cocher les droits|desactiver un agent|renommer un agent|compte agent',go:'utilisateurs',a:()=>asAdm()+asSteps(['Ouvrez <b>🔑 Agents de saisie</b>.','Saisissez nom, e-mail et mot de passe temporaire (10 caractères minimum), puis <b>Créer l’agent</b>.','Le nouvel agent est en <b>lecture seule</b> : cochez ses droits dans le tableau (Adhérents ou Gestion de projet : Ajouter, Modifier, Archiver ou Supprimer). C’est enregistré immédiatement.','<b>✏️ Modifier</b> change son nom ; <b>Désactiver</b> l’empêche de se connecter.'])+'Transmettez l’e-mail et le mot de passe à l’agent séparément.'},
+ {id:'agents',t:'Comment créer un agent et lui donner des droits ?',k:'creer un agent|nouvel agent|ajouter un agent|donner des droits|cocher les droits|desactiver un agent|renommer un agent|compte agent',go:'utilisateurs',a:()=>asAdm()+asSteps(['Ouvrez <b>🔑 Agents de saisie</b>.','Saisissez nom, e-mail et mot de passe temporaire (10 caractères minimum), puis <b>Créer l’agent</b>.','Le nouvel agent est en <b>lecture seule</b> : cochez ses droits dans le tableau (Adhérents, Archives et corbeille, Projets, Gestion de projet). C’est enregistré immédiatement.','<b>✏️ Modifier</b> change son nom ; <b>Désactiver</b> l’empêche de se connecter.'])+'Transmettez l’e-mail et le mot de passe à l’agent séparément.'},
  {id:'connexion',t:'Problème de connexion ou déconnexion automatique',k:'connexion|mot de passe|deconnecte|deconnexion|session expiree|mot de passe oublie|trop de tentatives|je n arrive pas a me connecter',a:()=>'<ul class="assteps"><li>Après <b>15 minutes sans activité</b>, la session se ferme pour votre sécurité : reconnectez-vous.</li><li>Après <b>5 erreurs</b> de mot de passe, il faut attendre 60 secondes.</li><li><b>Mot de passe oublié</b> ou compte désactivé : contactez l’administrateur.</li><li>Ne partagez jamais votre mot de passe.</li></ul>'},
  {id:'affichage',t:'Les données ne s’affichent pas ou ne sont pas à jour',k:'ne s affiche pas|pas a jour|chargement|actualiser|rafraichir|bug|probleme d affichage|donnees manquantes|lent',a:()=>asSteps(['Dans un projet de gestion, cliquez sur <b>⟳ Actualiser</b>.','Sinon, rechargez la page (touche F5, ou tirez vers le bas sur téléphone).','Vérifiez votre connexion Internet.','Si cela continue, déconnectez-vous puis reconnectez-vous et prévenez l’administrateur.'])},
  {id:'sensible',t:'Pourquoi je ne vois pas la CNI ou le compte bancaire ?',k:'cni|compte bancaire|banque|adresse|informations sensibles|donnees sensibles|confidentiel',a:()=>isAdmin()?'En tant qu’administrateur, vous voyez la CNI, l’adresse, la banque et le n° de compte (dans la liste, l’export CSV et les fiches de l’assistant).':'Pour protéger les adhérents, la <b>CNI, l’adresse, la banque et le n° de compte</b> ne sont visibles et modifiables que par les administrateurs. Vous les saisissez lors d’une nouvelle adhésion, mais vous ne les voyez plus ensuite.'},
@@ -1478,7 +1626,7 @@ async function asAsk(q){
   if(qWords.length||qNums.length){asMsg(`Je n’ai trouvé personne qui ressemble à « <b>${esc(q)}</b> ».<ul class="assteps"><li>Essayez seulement le <b>nom de famille</b>, ou seulement le <b>prénom</b>.</li><li>Essayez avec le <b>numéro de téléphone</b> (au moins 3 chiffres) ou le <b>matricule</b>.</li><li>La personne a peut-être été supprimée de la Gestion de projet${isAdmin()?'':' ou se trouve dans un dossier que vous ne pouvez pas voir'}.</li></ul>`);return}
   asMsg('Je n’ai pas compris la question. Choisissez un sujet ou reformulez :');asChips();
 }
-function asAll(){asMsg('<div class="aschips">'+AS_TOPICS.filter(t=>isAdmin()||!['projets','agents','restaurer'].includes(t.id)).map(t=>`<button type="button" data-astopic="${t.id}">${esc(t.t)}</button>`).join('')+'</div>')}
+function asAll(){asMsg('<div class="aschips">'+AS_TOPICS.filter(t=>isAdmin()||!['projets','agents'].includes(t.id)).map(t=>`<button type="button" data-astopic="${t.id}">${esc(t.t)}</button>`).join('')+'</div>')}
 function asToggle(on){
   AS.open=on===undefined?!AS.open:on;$('asPanel').classList.toggle('hidden',!AS.open);$('asFab').classList.toggle('on',AS.open);
   if(AS.open){if(!$('asLog').children.length)asWelcome();setTimeout(()=>$('asIn').focus(),50);AS.gp=null;asLoadGp()}
