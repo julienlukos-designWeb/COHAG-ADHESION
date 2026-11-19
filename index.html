@@ -200,6 +200,9 @@ tfoot td{font-weight:800;color:#14285f;background:#f4f7ff;border-top:2px solid #
 .gpptab td{padding:0;border:0}.gpptab td:nth-child(3){grid-column:1/-1;grid-row:2}.gpptab input{min-width:0;width:100%}
 .gpptab .pn::placeholder{color:#9aa6bd}}
 @media print{.gptabs,.gpbar,.gpdlg{display:none!important}}
+.gpopt{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
+.gpopt.o-Terrain{background:#e6f0ff;color:#1c5fd1}.gpopt.o-Villa{background:#e3f8eb;color:#138a43}.gpopt.o-Appartement{background:#fff1e3;color:#c76a0a}.gpopt.o-none{background:#f1f3f8;color:#8a93a8}
+.gpoptsel{width:auto;min-width:128px;padding:6px 8px;border-radius:10px;font-size:13px}
 /* ===== Images COHAG ===== */
 .brand{padding:4px 0 22px;text-shadow:none}
 .brand .logo{display:block;background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 6px 0 #06133a,0 12px 22px #0008,inset 0 1px #fff}
@@ -478,11 +481,11 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 <div class="hero gphero"><div><span class="pill">GESTION DE PROJET</span><h2>Suivi des acomptes et versements</h2><p>Chaque projet reprend le fonctionnement du logiciel Excel : pages par année, sans date, versements complets et attestations, avec tous les calculs automatiques.</p></div></div>
 <div class="panel"><div class="panelhead"><div><h3>Projets en cours</h3><div class="muted">Cliquez sur un projet pour le gérer.</div></div></div><div id="gpMsg" class="message" role="alert"></div><div id="gpCards" class="pcards"></div></div>
 <div class="panel"><div class="panelhead"><div><h3>🕘 Dernières modifications</h3><div class="muted">Qui a ajouté, modifié ou supprimé quoi dans la Gestion de projet, avec la date et l’heure. Enregistré automatiquement, non modifiable.</div></div><button class="btn light" type="button" data-jreload="all">⟳ Actualiser</button></div><div class="jbar"><select id="jAgentAll" aria-label="Filtrer par agent"><option value="">Tous les agents</option></select></div><ul id="gpJournal" class="journal"></ul><div class="jbar"><button class="btn mini light hidden" type="button" data-jmore="all">Afficher plus</button></div></div>
-<div class="panel"><div class="panelhead"><div><h3 id="gpPFTitle">Ajouter un projet</h3><div class="muted">Le prix au m² sert au calcul automatique des attestations (superficie × prix).</div></div></div>
+<div class="panel"><div class="panelhead"><div><h3 id="gpPFTitle">Ajouter un projet</h3><div class="muted">Le prix au m² sert au calcul des attestations « Terrain » (superficie × prix). Il reste modifiable à tout moment.</div></div></div>
 <form id="gpProjForm" class="formgrid" autocomplete="off">
 <div><label for="gpp_nom">Nom du projet *</label><input id="gpp_nom" required minlength="2" maxlength="80"></div>
 <div><label for="gpp_loc">Localisation</label><input id="gpp_loc" maxlength="120"></div>
-<div><label for="gpp_prix">Prix au m² pour les attestations (FCFA) *</label><input id="gpp_prix" type="number" min="0" step="1" value="50000" required></div>
+<div><label for="gpp_prix">Prix au m² des terrains (FCFA) *</label><input id="gpp_prix" type="number" min="0" step="1" value="50000" required></div>
 <div><label for="gpp_an">Première année de suivi *</label><input id="gpp_an" type="number" min="1990" max="2200" step="1" required></div>
 <div style="grid-column:1/-1"><label for="gpp_desc">Description</label><textarea id="gpp_desc" maxlength="600"></textarea></div>
 <div class="actions"><button class="btn light" type="reset">Annuler</button><button id="gpProjSave" class="btn primary" type="submit">Ajouter le projet</button></div></form>
@@ -490,7 +493,7 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 </section>
 <section id="gprojetView" class="view hidden">
 <div class="hero gphero"><div><span class="pill" id="gpLoc">PROJET</span><h2 id="gpName"></h2><p id="gpMeta"></p></div></div>
-<div class="toolbar gpbar" style="margin-bottom:16px"><button class="btn light" type="button" data-gpback>← Tous les projets</button><button class="btn light" type="button" data-gprefresh>⟳ Actualiser</button><button class="btn light" type="button" data-gpset>⚙ Paramètres</button><button class="btn danger" type="button" data-gpdelproj>Supprimer le projet</button></div>
+<div class="toolbar gpbar" style="margin-bottom:16px"><button class="btn light" type="button" data-gpback>← Tous les projets</button><button class="btn light" type="button" data-gprefresh>⟳ Actualiser</button><button class="btn light" type="button" data-gpset>⚙ Paramètres</button><button class="btn light" type="button" data-gpprix>💲 Prix du m²</button><button class="btn danger" type="button" data-gpdelproj>Supprimer le projet</button></div>
 <div id="gpTabs" class="gptabs" role="tablist" aria-label="Pages du projet"></div>
 <div id="gpLMsg" class="message" role="alert"></div>
 <div id="gpBody"></div>
@@ -506,9 +509,13 @@ td.num{letter-spacing:.3px;word-spacing:2px;white-space:nowrap}
 <div><label for="g_pre">Prénom(s) *</label><input id="g_pre" maxlength="80"></div>
 <div><label for="g_nom">Nom *</label><input id="g_nom" maxlength="80"></div>
 <div><label for="g_tel">Téléphone</label><input id="g_tel" maxlength="30" inputmode="tel"></div>
+<div><label for="g_opt">Option d’acquisition</label><select id="g_opt"><option value="">Non renseignée</option><option>Terrain</option><option>Villa</option><option>Appartement</option></select></div>
 <div class="gpd"><label for="g_date">Date d’arrivée</label><input id="g_date" type="date" min="1990-01-01" max="2200-12-31"></div>
 <div class="gpv"><label for="g_parc">N° parcelle</label><input id="g_parc" maxlength="30"></div>
 <div class="gpv"><label for="g_sup">Superficie (m²)</label><input id="g_sup" type="number" min="0" step="0.01" inputmode="decimal"></div>
+<div class="gpatt gpvilla"><label for="g_pterr">Prix du terrain (FCFA)</label><input id="g_pterr" type="number" min="0" step="1" inputmode="numeric"></div>
+<div class="gpatt gpvilla"><label for="g_pcons">Prix de la construction (FCFA)</label><input id="g_pcons" type="number" min="0" step="1" inputmode="numeric"></div>
+<div class="gpatt gpappart"><label for="g_pfixe">Prix de l’appartement (FCFA)</label><input id="g_pfixe" type="number" min="0" step="1" inputmode="numeric"></div>
 <div id="gpAttCalc" class="kv" style="grid-column:1/-1"></div>
 <div class="section gppay">Acomptes / versements de cette personne · <span id="gpPayTot"></span></div>
 <div class="gppay" style="grid-column:1/-1"><div class="tablewrap"><table class="gpptab"><thead><tr><th>Date</th><th>Montant (FCFA)</th><th>Note</th><th></th></tr></thead><tbody id="gpPayRows"></tbody></table></div>
@@ -995,7 +1002,7 @@ $('usrRows').onclick=async e=>{
    versement complet, attestations) avec calculs automatiques.
    Les agents n'agissent ici que selon leurs droits gp_ajouter / gp_modifier / gp_supprimer.
    ===================================================================== */
-const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',sort:'date',edit:null,projEdit:null,busy:false};
+const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',sort:'date',edit:null,projEdit:null,busy:false,of:'',newCols:true};
 /* Pages des années : tri par ordre d'arrivée (date la plus ancienne d'abord, personnes sans date à la fin) ou par N° */
 const gpSorted=k=>{const a=gpOf(k);if(k[0]!=='y'||GP.sort!=='date')return a;
   return a.slice().sort((x,y)=>(!x.date_arrivee)-(!y.date_arrivee)||String(x.date_arrivee||'').localeCompare(String(y.date_arrivee||''))||(x.numero??1e9)-(y.numero??1e9))};
@@ -1006,7 +1013,15 @@ const gpKey=l=>l.page==='acompte'?'y'+l.annee:l.page;
 const gpLabel=k=>k[0]==='y'?'Année '+k.slice(1):({sans_date:'Sans date',versement:'Versement complet',attestation:'Attestations'})[k]||k;
 const gpIsAcompte=k=>k[0]==='y'||k==='sans_date';
 /* Montant d'une ligne : somme de ses acomptes ; attestation = superficie × prix au m² (comme =H8*50000 dans Excel) */
-const gpMt=l=>l.page==='attestation'?Math.round((Number(l.superficie)||0)*(Number(gpP()?.prix_m2)||0)):(GP.pay[l.id]||[]).reduce((s,x)=>s+Number(x.montant||0),0);
+/* Attestation selon l'option : Terrain (ou non renseignée) = superficie × prix du m² du projet ;
+   Villa = prix du terrain + prix de la construction ; Appartement = prix fixe saisi */
+const GP_OPTS=['Terrain','Villa','Appartement'];
+const gpAttMt=(l,pm)=>l.option_acquisition==='Villa'?(Number(l.prix_terrain)||0)+(Number(l.prix_construction)||0):l.option_acquisition==='Appartement'?(Number(l.prix_fixe)||0):Math.round((Number(l.superficie)||0)*(Number(pm)||0));
+const gpMt=l=>l.page==='attestation'?gpAttMt(l,gpP()?.prix_m2):(GP.pay[l.id]||[]).reduce((s,x)=>s+Number(x.montant||0),0);
+const GP_COLS='id,page,annee,numero,prenom,nom,telephone,date_arrivee,date_texte,n_parcelle,superficie';
+const GP_NEW=',option_acquisition,prix_terrain,prix_construction,prix_fixe';
+const gpOptTag=o=>o?`<span class="gpopt o-${esc(o)}">${esc(o)}</span>`:'<span class="gpopt o-none">—</span>';
+const gpMissing=e=>e&&(e.code==='42703'||/column|colonne/i.test(e.message||''));
 const gpYears=()=>[...new Set([...(gpP()?.annees||[]),...GP.lignes.filter(l=>l.page==='acompte').map(l=>l.annee)])].sort((a,b)=>a-b);
 const gpKeys=()=>[...gpYears().map(y=>'y'+y),'sans_date','versement','attestation'];
 const gpOf=k=>GP.lignes.filter(l=>gpKey(l)===k).sort((a,b)=>(a.numero??1e9)-(b.numero??1e9)||a.prenom.localeCompare(b.prenom,'fr'));
@@ -1058,10 +1073,13 @@ async function gpLoad(){
   msg('gpLMsg','Chargement…');
   try{
     await gpFetchProjets();if(!gpP()){show('gestion');return}
-    const [lg,pm]=await Promise.all([gpAll('gp_lignes','id,page,annee,numero,prenom,nom,telephone,date_arrivee,date_texte,n_parcelle,superficie',GP.cur),gpAll('gp_paiements','id,ligne_id,montant,date_paiement,note,created_at',GP.cur)]);
+    let lg;
+    try{lg=await gpAll('gp_lignes',GP_COLS+GP_NEW,GP.cur);GP.newCols=true}
+    catch(e){if(!gpMissing(e))throw e;GP.newCols=false;lg=await gpAll('gp_lignes',GP_COLS,GP.cur)}
+    const pm=await gpAll('gp_paiements','id,ligne_id,montant,date_paiement,note,created_at',GP.cur);
     GP.lignes=lg;GP.pay={};
     pm.sort((a,b)=>String(a.date_paiement||'9999').localeCompare(String(b.date_paiement||'9999'))||String(a.created_at).localeCompare(String(b.created_at))).forEach(x=>(GP.pay[x.ligne_id]=GP.pay[x.ligne_id]||[]).push(x));
-    msg('gpLMsg','');
+    msg('gpLMsg',GP.newCols?'':'⚠️ Les options (Terrain, Villa, Appartement) ne sont pas encore activées : l’administrateur doit exécuter le script SQL « options_attestations » dans Supabase.',GP.newCols?undefined:'error');
   }catch(e){msg('gpLMsg',gpErr(e,'Chargement impossible. Vérifiez votre connexion puis cliquez sur « Actualiser ».'),'error')}
   gpRender();
 }
@@ -1069,7 +1087,7 @@ async function gpLoad(){
 function gpRender(){
   const p=gpP();if(!p)return;
   $('gpName').textContent=p.nom;$('gpLoc').textContent=(p.localisation||'PROJET').toUpperCase();
-  $('gpMeta').textContent=GP.lignes.length+' personnes enregistrées · Attestation : superficie × '+gpNf(p.prix_m2)+' F le m²';
+  $('gpMeta').textContent=GP.lignes.length+' personnes enregistrées · Prix du m² : '+gpNf(p.prix_m2)+' F · Attestation Terrain = superficie × prix du m² · Villa = terrain + construction · Appartement = prix fixe';
   const keys=gpKeys();if(GP.tab!=='home'&&!keys.includes(GP.tab))GP.tab='home';
   $('gpTabs').innerHTML=`<button class="gptab ${GP.tab==='home'?'on':''}" type="button" role="tab" aria-selected="${GP.tab==='home'}" data-tab="home">🏠 Accueil</button>`+keys.map(k=>`<button class="gptab ${GP.tab===k?'on':''}" type="button" role="tab" aria-selected="${GP.tab===k}" data-tab="${k}">${esc(gpLabel(k))}</button>`).join('')+(can('gp_modifier')?`<button class="gptab add" type="button" data-addyear>＋ Année</button>`:'');
   GP.tab==='home'?gpHome():gpPage(GP.tab);
@@ -1079,7 +1097,7 @@ function gpRender(){
 
 function gpApplyPerms(){
   const v=$('gprojetView'),t=(sel,ok)=>v.querySelectorAll(sel).forEach(b=>b.classList.toggle('hidden',!ok));
-  t('[data-gpadd]',can('gp_ajouter'));t('[data-gpset]',can('gp_modifier'));t('[data-gpdelproj]',can('gp_supprimer'));
+  t('[data-gpadd]',can('gp_ajouter'));t('[data-gpset]',can('gp_modifier'));t('[data-gpprix]',can('gp_modifier'));t('[data-gpdelproj]',can('gp_supprimer'));
 }
 function gpHome(){
   const keys=gpKeys(),S={};keys.forEach(k=>S[k]=gpSum(k));
@@ -1097,7 +1115,7 @@ ${ac.map(k=>`<tr data-tab="${k}"><td><b>${esc(k[0]==='y'?'Acompte '+k.slice(1):'
 <tr class="grand" data-tab="home"><td>TOTAL ACOMPTE ET VERSEMENT</td><td class="num"></td><td class="num">${nAc+S.versement.n}</td><td class="num">${money(totAll)}</td></tr>
 <tr data-tab="attestation"><td><b>Attestations</b> <small class="muted">(hors total)</small></td><td class="num">${S.attestation.c}</td><td class="num">${S.attestation.n}</td><td class="num">${money(S.attestation.t)}</td></tr>
 </tbody></table></div></div>
-<div class="col2"><div class="panel"><h3>⚠️ À vérifier</h3><div class="muted">Dates illisibles ou d’une autre année que leur page.</div><ul class="gpres">${bad.map(l=>`<li><button type="button" data-ligne="${esc(l.id)}"><span><b>${esc(l.prenom)} ${esc(l.nom)}</b><small>${esc(gpLabel(gpKey(l)))} · N° ${esc(l.numero??'—')}</small></span><span class="tag">${esc(gpDate(l))}</span></button></li>`).join('')||'<li class="muted">Aucune anomalie. ✅</li>'}</ul></div></div></div>`;
+<div class="col2"><div class="panel"><h3>🏠 Options des membres</h3><div class="muted">Répartition dans tout le projet. Cliquez sur une option pour voir les attestations correspondantes ; dans chaque page, l’option se choisit directement dans la liste.</div><ul class="gpres">${[...GP_OPTS,''].map(o=>{const n=GP.lignes.filter(l=>(l.option_acquisition||'')===o).length;return `<li><button type="button" data-gpof="${esc(o||'none')}"><span>${o?gpOptTag(o):'<span class="gpopt o-none">Non renseignée</span>'}</span><span class="tag">${n} personne${n>1?'s':''}</span></button></li>`}).join('')}</ul></div><div class="panel"><h3>⚠️ À vérifier</h3><div class="muted">Dates illisibles ou d’une autre année que leur page.</div><ul class="gpres">${bad.map(l=>`<li><button type="button" data-ligne="${esc(l.id)}"><span><b>${esc(l.prenom)} ${esc(l.nom)}</b><small>${esc(gpLabel(gpKey(l)))} · N° ${esc(l.numero??'—')}</small></span><span class="tag">${esc(gpDate(l))}</span></button></li>`).join('')||'<li class="muted">Aucune anomalie. ✅</li>'}</ul></div></div></div>`;
   $('gpQ').oninput=e=>{GP.q=e.target.value;gpSearch()};gpSearch();
 }
 /* Recherche : chaque mot saisi doit être un mot entier du prénom ou du nom (règle de la macro Excel),
@@ -1118,17 +1136,18 @@ function gpSearch(){
 
 function gpPage(k){
   const vers=k==='versement'||k==='attestation',lab=k==='versement'||k==='attestation'?'Versement':'Acompte',s=gpSum(k);
-  $('gpBody').innerHTML=`<div class="panel"><div class="panelhead"><div><h3>${esc(gpLabel(k))}</h3><div class="muted">${s.c} personne${s.c>1?'s':''} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''} · Total ${money(s.t)}${k==='attestation'?' · Versement = superficie × '+gpNf(gpP().prix_m2)+' F':''}</div></div>
-<div class="toolbar gpbar"><button class="btn primary" type="button" data-gpadd>＋ Ajouter une personne</button><button class="btn light" type="button" data-gpcsv="${k}">Exporter CSV</button><button class="btn light" type="button" data-gpprint>Imprimer</button></div></div>
-<div class="searchrow gpbar"><input id="gpPq" type="search" maxlength="60" placeholder="Filtrer cette page (prénom, nom, téléphone)…" aria-label="Filtrer cette page" value="${esc(GP.pq)}">${k[0]==='y'?`<select id="gpSort" aria-label="Ordre d’affichage"><option value="date"${GP.sort==='date'?' selected':''}>Ordre d’arrivée (date la plus ancienne d’abord)</option><option value="num"${GP.sort==='num'?' selected':''}>Ordre des numéros (N°)</option></select>`:''}</div>
-<div class="tablewrap"><table><thead><tr><th>N°</th><th>Prénoms</th><th>Noms</th><th>Téléphone</th>${vers?'<th>N° parcelle</th><th class="num">Versement</th><th class="num">Superficie</th>':'<th>Date d’arrivée</th><th class="num">Acompte</th><th class="num">Nb</th>'}</tr></thead><tbody id="gpRows"></tbody>
-<tfoot><tr><td colspan="5">TOTAL ${k==='attestation'?'ATTESTATIONS':k==='versement'?'VERSEMENT COMPLET':'ACOMPTE'} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''}</td><td class="num">${money(s.t)}</td><td></td></tr></tfoot></table></div></div>`;
-  $('gpPq').oninput=e=>{GP.pq=e.target.value;gpRows(k)};if($('gpSort'))$('gpSort').onchange=e=>{GP.sort=e.target.value;gpRows(k)};gpRows(k);
+  $('gpBody').innerHTML=`<div class="panel"><div class="panelhead"><div><h3>${esc(gpLabel(k))}</h3><div class="muted">${s.c} personne${s.c>1?'s':''} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''} · Total ${money(s.t)}${k==='attestation'?' · Terrain = superficie × '+gpNf(gpP().prix_m2)+' F · Villa = terrain + construction · Appartement = prix fixe':''}</div></div>
+<div class="toolbar gpbar"><button class="btn primary" type="button" data-gpadd>＋ Ajouter une personne</button><button class="btn light" type="button" data-gpcsv="${k}">Exporter CSV</button><button class="btn light" type="button" data-gpprint>Imprimer</button>${k==='attestation'?'<button class="btn light" type="button" data-gpprix>💲 Prix du m²</button>':''}</div></div>
+<div class="searchrow gpbar"><input id="gpPq" type="search" maxlength="60" placeholder="Filtrer cette page (prénom, nom, téléphone)…" aria-label="Filtrer cette page" value="${esc(GP.pq)}"><select id="gpOf" aria-label="Filtrer par option"><option value="">Toutes les options</option>${GP_OPTS.map(o=>`<option${GP.of===o?' selected':''}>${o}</option>`).join('')}<option value="none"${GP.of==='none'?' selected':''}>Option non renseignée</option></select>${k[0]==='y'?`<select id="gpSort" aria-label="Ordre d’affichage"><option value="date"${GP.sort==='date'?' selected':''}>Ordre d’arrivée (date la plus ancienne d’abord)</option><option value="num"${GP.sort==='num'?' selected':''}>Ordre des numéros (N°)</option></select>`:''}</div>
+<div class="tablewrap"><table><thead><tr><th>N°</th><th>Prénoms</th><th>Noms</th><th>Téléphone</th><th>Option</th>${vers?'<th>N° parcelle</th><th class="num">Versement</th><th class="num">Superficie</th>':'<th>Date d’arrivée</th><th class="num">Acompte</th><th class="num">Nb</th>'}</tr></thead><tbody id="gpRows"></tbody>
+<tfoot><tr><td colspan="6">TOTAL ${k==='attestation'?'ATTESTATIONS':k==='versement'?'VERSEMENT COMPLET':'ACOMPTE'} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''}</td><td class="num">${money(s.t)}</td><td></td></tr></tfoot></table></div></div>`;
+  $('gpPq').oninput=e=>{GP.pq=e.target.value;gpRows(k)};$('gpOf').onchange=e=>{GP.of=e.target.value;gpRows(k)};if($('gpSort'))$('gpSort').onchange=e=>{GP.sort=e.target.value;gpRows(k)};gpRows(k);
 }
 function gpRows(k){
   const vers=k==='versement'||k==='attestation',q=gpNorm(GP.pq),qd=GP.pq.replace(/\D/g,'');
-  const arr=gpSorted(k).filter(l=>!q||gpNorm(l.prenom+' '+l.nom).includes(q)||(qd.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(qd)));
-  $('gpRows').innerHTML=arr.map(l=>{const m=gpMt(l),np=(GP.pay[l.id]||[]).length;return `<tr class="${gpBad(l)?'bad':''}"><td>${esc(l.numero??'')}</td><td><button class="lnk" type="button" data-ligne="${esc(l.id)}">${esc(l.prenom)||'—'}</button></td><td>${esc(l.nom)}</td><td>${esc(l.telephone||'')}</td>${vers?`<td>${esc(l.n_parcelle||'')}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${l.superficie!=null?gpNf(l.superficie):''}</td>`:`<td class="dt">${esc(gpDate(l))}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${np>1?np:''}</td>`}</tr>`}).join('')||'<tr><td colspan="7" class="empty">Aucune personne sur cette page.</td></tr>';
+  const arr=gpSorted(k).filter(l=>!q||gpNorm(l.prenom+' '+l.nom).includes(q)||(qd.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(qd))).filter(l=>!GP.of||(GP.of==='none'?!l.option_acquisition:l.option_acquisition===GP.of));
+  const ed=can('gp_modifier')&&GP.newCols,optCell=l=>ed?`<select class="gpoptsel" data-optl="${esc(l.id)}" aria-label="Option de ${esc(l.prenom)} ${esc(l.nom)}"><option value="">—</option>${GP_OPTS.map(o=>`<option${l.option_acquisition===o?' selected':''}>${o}</option>`).join('')}</select>`:gpOptTag(l.option_acquisition);
+  $('gpRows').innerHTML=arr.map(l=>{const m=gpMt(l),np=(GP.pay[l.id]||[]).length;return `<tr class="${gpBad(l)?'bad':''}"><td>${esc(l.numero??'')}</td><td><button class="lnk" type="button" data-ligne="${esc(l.id)}">${esc(l.prenom)||'—'}</button></td><td>${esc(l.nom)}</td><td>${esc(l.telephone||'')}</td><td>${optCell(l)}</td>${vers?`<td>${esc(l.n_parcelle||'')}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${l.superficie!=null?gpNf(l.superficie):''}</td>`:`<td class="dt">${esc(gpDate(l))}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${np>1?np:''}</td>`}</tr>`}).join('')||'<tr><td colspan="7" class="empty">Aucune personne sur cette page.</td></tr>';
 }
 
 /* ---------- Fiche d'une personne + historique des acomptes ---------- */
@@ -1138,14 +1157,21 @@ function gpToggle(){
   document.querySelectorAll('#gpForm .gpd').forEach(x=>x.classList.toggle('hidden',isV));
   document.querySelectorAll('#gpForm .gpv').forEach(x=>x.classList.toggle('hidden',!isV));
   document.querySelectorAll('#gpForm .gppay').forEach(x=>x.classList.toggle('hidden',isA));
+  const o=$('g_opt').value;
+  document.querySelectorAll('#gpForm .gpvilla').forEach(x=>x.classList.toggle('hidden',!isA||o!=='Villa'));
+  document.querySelectorAll('#gpForm .gpappart').forEach(x=>x.classList.toggle('hidden',!isA||o!=='Appartement'));
+  document.querySelectorAll('#gpForm .gpv').forEach(x=>{if(x.querySelector('#g_sup'))x.classList.toggle('hidden',!isV||(isA&&o==='Appartement'))});
   $('gpAttCalc').classList.toggle('hidden',!isA);gpCalc();
 }
 function gpPayRow(x){return `<tr data-pid="${esc(x?.id||'')}"><td><input type="date" class="pd" value="${esc(x?.date_paiement||'')}" min="1990-01-01" max="2200-12-31" aria-label="Date"></td><td><input type="number" class="pm" min="1" step="1" inputmode="numeric" value="${esc(x?.montant??'')}" aria-label="Montant"></td><td><input class="pn" maxlength="200" value="${esc(x?.note||'')}" aria-label="Note" placeholder="Note (facultatif)"></td><td><button type="button" class="btn mini danger" data-delpay aria-label="Retirer cet acompte">✕</button></td></tr>`}
 function gpCalc(){
   const t=[...$('gpPayRows').querySelectorAll('.pm')].reduce((s,i)=>s+(Number(i.value)||0),0);
   $('gpPayTot').textContent='Total : '+money(t);
-  const sup=Number($('g_sup').value)||0,pr=Number(gpP()?.prix_m2)||0;
-  $('gpAttCalc').innerHTML=`<small>Versement calculé automatiquement</small><b>${gpNf(sup)} m² × ${gpNf(pr)} F = ${money(Math.round(sup*pr))}</b>`;
+  const sup=Number($('g_sup').value)||0,pr=Number(gpP()?.prix_m2)||0,o=$('g_opt').value;
+  const pt=Number($('g_pterr').value)||0,pc=Number($('g_pcons').value)||0,pf=Number($('g_pfixe').value)||0;
+  $('gpAttCalc').innerHTML=o==='Villa'?`<small>Prix de la villa (calculé automatiquement)</small><b>Terrain ${money(pt)} + Construction ${money(pc)} = ${money(pt+pc)}</b>`
+    :o==='Appartement'?`<small>Prix de l’appartement</small><b>${money(pf)}</b>`
+    :`<small>Prix du terrain (calculé automatiquement)${o?'':' · choisissez l’option du membre ci-dessus'}</small><b>${gpNf(sup)} m² × ${gpNf(pr)} F = ${money(Math.round(sup*pr))}</b>`;
 }
 function gpFiche(id){
   const l=id?GP.lignes.find(x=>x.id===id):null;if(id&&!l)return;
@@ -1155,6 +1181,8 @@ function gpFiche(id){
   $('gpDT').textContent=l?(l.prenom+' '+l.nom).trim()||'Fiche':'Nouvelle personne';
   $('g_num').value=l?.numero??'';$('g_pre').value=l?.prenom||'';$('g_nom').value=l?.nom||'';$('g_tel').value=l?.telephone||'';
   $('g_date').value=l?.date_arrivee||'';$('g_parc').value=l?.n_parcelle||'';$('g_sup').value=l?.superficie??'';
+  $('g_opt').value=l?.option_acquisition||'';$('g_pterr').value=l?.prix_terrain??'';$('g_pcons').value=l?.prix_construction??'';$('g_pfixe').value=l?.prix_fixe??'';
+  $('g_opt').closest('div').classList.toggle('hidden',!GP.newCols);
   $('gpPayRows').innerHTML=(l?(GP.pay[l.id]||[]):[]).map(gpPayRow).join('');
   if(!l||!(GP.pay[l.id]||[]).length)$('gpPayRows').insertAdjacentHTML('beforeend',gpPayRow(null));
   const w=[];if(l?.date_texte)w.push('Date saisie dans Excel : « '+l.date_texte+' » (date invalide). Choisissez la bonne date ci-dessous puis enregistrez.');
@@ -1171,7 +1199,8 @@ function gpFiche(id){
 }
 $('gpAddPay').onclick=()=>{$('gpPayRows').insertAdjacentHTML('beforeend',gpPayRow(null));$('gpPayRows').lastElementChild.querySelector('.pm').focus();gpCalc()};
 $('gpPayRows').onclick=e=>{const b=e.target.closest('[data-delpay]');if(b){b.closest('tr').remove();gpCalc()}};
-$('gpPayRows').oninput=gpCalc;$('g_sup').oninput=gpCalc;$('g_page').onchange=gpToggle;
+$('gpPayRows').oninput=gpCalc;$('g_sup').oninput=gpCalc;$('g_page').onchange=gpToggle;$('g_opt').onchange=gpToggle;
+['g_pterr','g_pcons','g_pfixe'].forEach(i=>$(i).oninput=gpCalc);
 $('gpClose').onclick=()=>$('gpDlg').close();
 
 $('gpForm').onsubmit=async e=>{
@@ -1184,6 +1213,9 @@ $('gpForm').onsubmit=async e=>{
   if(numS!==''&&(!Number.isInteger(Number(numS))||Number(numS)<0)){msg('gpFMsg','N° invalide.','error');return}
   if(supS!==''&&!(Number(supS)>=0)){msg('gpFMsg','Superficie invalide.','error');return}
   if(d&&(d<'1990-01-01'||d>'2200-12-31')){msg('gpFMsg','Date d’arrivée invalide.','error');return}
+  const opt=$('g_opt').value||null,pv=i=>{const v=$(i).value.trim();return v===''?null:Number(v)};
+  const pT=pv('g_pterr'),pC=pv('g_pcons'),pF=pv('g_pfixe');
+  if([pT,pC,pF].some(v=>v!==null&&(!Number.isInteger(v)||v<0))){msg('gpFMsg','Les prix doivent être des montants entiers positifs.','error');return}
   /* Acomptes saisis */
   const pays=[];
   for(const tr of $('gpPayRows').querySelectorAll('tr')){
@@ -1197,6 +1229,7 @@ $('gpForm').onsubmit=async e=>{
   if(numero===null&&(!old||gpKey(old)!==k))numero=gpOf(k).reduce((m,x)=>Math.max(m,x.numero||0),0)+1;
   else if(numero===null)numero=old.numero;
   const rec={page,annee,numero,prenom:pre,nom,telephone:$('g_tel').value.trim()||null,date_arrivee:d,date_texte:(d||!gpIsAcompte(k))?null:(old?.date_texte||null),n_parcelle:$('g_parc').value.trim()||null,superficie:supS===''?null:Number(supS)};
+  if(GP.newCols)Object.assign(rec,{option_acquisition:opt,prix_terrain:opt==='Villa'?pT:null,prix_construction:opt==='Villa'?pC:null,prix_fixe:opt==='Appartement'?pF:null});
   GP.busy=true;$('gpSave').disabled=true;msg('gpFMsg','Enregistrement…');
   try{
     let id=GP.edit;
@@ -1230,13 +1263,28 @@ $('gpDel').onclick=async()=>{
 /* ---------- Actions de la page projet ---------- */
 function gpCsv(k){
   const keys=k==='all'?gpKeys():[k],p=gpP();
-  const h=['Page','N°','Prénoms','Noms','Téléphone','Date d’arrivée','N° parcelle','Superficie','Montant FCFA','Nombre d’acomptes'];
-  const rows=keys.flatMap(x=>gpSorted(x).map(l=>[gpLabel(x),l.numero??'',l.prenom,l.nom,l.telephone||'',l.page==='versement'||l.page==='attestation'?'':gpDate(l),l.n_parcelle||'',l.superficie??'',gpMt(l),l.page==='attestation'?'':(GP.pay[l.id]||[]).length]));
+  const h=['Page','N°','Prénoms','Noms','Téléphone','Option','Date d’arrivée','N° parcelle','Superficie','Prix terrain (villa)','Prix construction (villa)','Prix appartement','Montant FCFA','Nombre d’acomptes'];
+  const rows=keys.flatMap(x=>gpSorted(x).map(l=>[gpLabel(x),l.numero??'',l.prenom,l.nom,l.telephone||'',l.option_acquisition||'',l.page==='versement'||l.page==='attestation'?'':gpDate(l),l.n_parcelle||'',l.superficie??'',l.prix_terrain??'',l.prix_construction??'',l.prix_fixe??'',gpMt(l),l.page==='attestation'?'':(GP.pay[l.id]||[]).length]));
   const csv='﻿'+[h,...rows].map(r=>r.map(csvCell).join(';')).join('\r\n');
   const u=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   const a=document.createElement('a');a.href=u;a.download=('Gestion_'+p.nom+'_'+(k==='all'?'complet':gpLabel(k))+'_'+new Date().toISOString().slice(0,10)).replace(/[^\w.-]+/g,'_')+'.csv';a.click();
   setTimeout(()=>URL.revokeObjectURL(u),1000);
 }
+/* Choix rapide de l'option directement dans la liste */
+$('gprojetView').addEventListener('change',async e=>{
+  const s=e.target.closest('[data-optl]');if(!s||!user)return;
+  if(!can('gp_modifier')){msg('gpLMsg',DENY,'error');return}
+  const l=GP.lignes.find(x=>x.id==s.dataset.optl);if(!l)return;
+  const v=s.value||null,rec={option_acquisition:v};
+  if(v!=='Villa'){rec.prix_terrain=null;rec.prix_construction=null}if(v!=='Appartement')rec.prix_fixe=null;
+  s.disabled=true;
+  const {data,error}=await client.from('gp_lignes').update(rec).eq('id',l.id).select('id');
+  s.disabled=false;
+  if(error||!data||!data.length){s.value=l.option_acquisition||'';return msg('gpLMsg',gpErr(error,'Modification de l’option impossible.'),'error')}
+  Object.assign(l,rec);
+  if(GP.tab!=='home')gpRows(GP.tab);
+  msg('gpLMsg','Option de '+(l.prenom+' '+l.nom).trim()+' : '+(v||'non renseignée')+'.'+(l.page==='attestation'&&v&&v!=='Terrain'?' Ouvrez sa fiche pour saisir le prix.':''),'success');
+});
 $('gprojetView').addEventListener('click',async e=>{
   const t=e.target.closest('button,tr[data-tab]');if(!t||!user)return;
   if(t.dataset.tab){if(t.dataset.tab!==GP.tab){GP.tab=t.dataset.tab;GP.pq='';msg('gpLMsg','');gpRender();window.scrollTo({top:0})}return}
@@ -1244,6 +1292,15 @@ $('gprojetView').addEventListener('click',async e=>{
   if('gpadd' in t.dataset)return can('gp_ajouter')?gpFiche(null):msg('gpLMsg',DENY,'error');
   if(t.dataset.gpcsv)return gpCsv(t.dataset.gpcsv);
   if('gpprint' in t.dataset)return window.print();
+  if(t.dataset.gpof){GP.of=t.dataset.gpof==='none'?'none':t.dataset.gpof;GP.tab='attestation';GP.pq='';gpRender();window.scrollTo({top:0});return}
+  if('gpprix' in t.dataset){
+    if(!can('gp_modifier'))return msg('gpLMsg',DENY,'error');
+    const p=gpP(),v=prompt('Nouveau prix du mètre carré pour « '+p.nom+' » (FCFA) :\nIl s’applique aux attestations « Terrain » de ce projet.',p.prix_m2);if(v===null)return;
+    const n=Number(String(v).replace(/\s/g,''));if(!Number.isInteger(n)||n<0)return msg('gpLMsg','Prix du m² invalide : saisissez un nombre entier.','error');
+    const {data,error}=await client.from('gp_projets').update({prix_m2:n}).eq('id',p.id).select('id');
+    if(error||!data||!data.length)return msg('gpLMsg',gpErr(error,'Modification du prix impossible.'),'error');
+    await gpLoad();return msg('gpLMsg','Prix du m² mis à jour : '+gpNf(n)+' F. Les attestations « Terrain » sont recalculées.','success');
+  }
   if('gpback' in t.dataset)return show('gestion');
   if('gprefresh' in t.dataset)return gpLoad();
   if('gpset' in t.dataset){if(!can('gp_modifier'))return msg('gpLMsg',DENY,'error');const p=gpP();show('gestion');GP.projEdit=p.id;$('gpp_nom').value=p.nom;$('gpp_loc').value=p.localisation||'';$('gpp_prix').value=p.prix_m2;$('gpp_desc').value=p.description||'';$('gpp_an').value=(p.annees||[])[0]||'';$('gpp_an').disabled=true;$('gpProjSave').textContent='Enregistrer les paramètres';$('gpPFTitle').textContent='Paramètres de « '+p.nom+' »';msg('gpPMsg','');$('gpProjForm').closest('.panel').classList.remove('hidden');$('gpp_nom').focus();return}
@@ -1487,9 +1544,10 @@ async function asLoadGp(){
   if(!GP.projets.length){try{await gpFetchProjets()}catch(_){return AS.gp=[]}}
   const page=async(t,c)=>{let out=[];for(let i=0;;i+=1000){const {data,error}=await client.from(t).select(c).order('id').range(i,i+999);if(error)throw error;out=out.concat(data||[]);if(!data||data.length<1000)break}return out};
   try{
-    const [lg,pm]=await Promise.all([page('gp_lignes','id,projet_id,page,annee,numero,prenom,nom,telephone,date_arrivee,date_texte,n_parcelle,superficie'),page('gp_paiements','ligne_id,montant')]);
+    const lc='id,projet_id,page,annee,numero,prenom,nom,telephone,date_arrivee,date_texte,n_parcelle,superficie';
+    const lg=await page('gp_lignes',lc+GP_NEW).catch(e=>{if(gpMissing(e))return page('gp_lignes',lc);throw e}),pm=await page('gp_paiements','ligne_id,montant');
     const tot={},nb={};pm.forEach(x=>{tot[x.ligne_id]=(tot[x.ligne_id]||0)+Number(x.montant||0);nb[x.ligne_id]=(nb[x.ligne_id]||0)+1});
-    AS.gp=lg.map(l=>{const p=GP.projets.find(x=>String(x.id)===String(l.projet_id));return {...l,proj:p?.nom||'—',mt:l.page==='attestation'?Math.round((Number(l.superficie)||0)*(Number(p?.prix_m2)||0)):(tot[l.id]||0),nb:nb[l.id]||0}});
+    AS.gp=lg.map(l=>{const p=GP.projets.find(x=>String(x.id)===String(l.projet_id));return {...l,proj:p?.nom||'—',mt:l.page==='attestation'?gpAttMt(l,p?.prix_m2):(tot[l.id]||0),nb:nb[l.id]||0}});
   }catch(e){console.error('assistant gp',e);AS.gp=[]}
   AS.gpAt=Date.now();return AS.gp;
 }
@@ -1526,7 +1584,7 @@ function asCard(r,i){
     const lab=gpLabel(o.page==='acompte'?'y'+o.annee:o.page);
     const dt=o.date_arrivee?new Date(o.date_arrivee+'T00:00:00').toLocaleDateString('fr-FR'):o.date_texte||'';
     return `<div class="ascard"><div class="ashead"><span class="avs" style="background:linear-gradient(135deg,#d6245f,#ff8a3d)">${esc(ini(o.prenom,o.nom))}</span><div><b>${esc(o.prenom)} ${esc(o.nom)}</b><small>📒 Gestion de projet · ${asPct(r.s)}</small></div></div>
-    <div class="askv">${asKV('Projet',o.proj)}${asKV('Page',lab)}${asKV('N°',o.numero??'—')}${asKV('Téléphone',o.telephone)}${asKV('Date d’arrivée',dt)}${asKV('N° parcelle',o.n_parcelle)}${o.superficie!=null?asKV('Superficie',gpNf(o.superficie)+' m²'):''}${asKV(o.page==='attestation'?'Attestation':'Total versé',money(o.mt))}${o.page!=='attestation'?asKV('Nombre d’acomptes',o.nb):''}</div>
+    <div class="askv">${asKV('Projet',o.proj)}${asKV('Page',lab)}${asKV('N°',o.numero??'—')}${asKV('Téléphone',o.telephone)}${asKV('Option',o.option_acquisition)}${asKV('Date d’arrivée',dt)}${asKV('N° parcelle',o.n_parcelle)}${o.superficie!=null?asKV('Superficie',gpNf(o.superficie)+' m²'):''}${asKV(o.page==='attestation'?'Attestation':'Total versé',money(o.mt))}${o.page!=='attestation'?asKV('Nombre d’acomptes',o.nb):''}</div>
     <div class="asact"><button class="btn mini primary" type="button" data-asgp="${esc(o.projet_id)}" data-asl="${esc(o.id)}">Ouvrir la fiche</button></div></div>`;
   }
   const p=o.permissions||{},dr=o.role==='admin'?'Tous les droits':Object.keys(PERMS).filter(k=>p[k]===true).map(k=>permGroup(k)+' : '+PERMS[k]).join(', ')||'Lecture seule';
