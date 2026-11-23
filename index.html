@@ -203,6 +203,14 @@ tfoot td{font-weight:800;color:#14285f;background:#f4f7ff;border-top:2px solid #
 .gpopt{display:inline-block;padding:3px 9px;border-radius:999px;font-size:12px;font-weight:800;white-space:nowrap}
 .gpopt.o-Terrain{background:#e6f0ff;color:#1c5fd1}.gpopt.o-Villa{background:#e3f8eb;color:#138a43}.gpopt.o-Appartement{background:#fff1e3;color:#c76a0a}.gpopt.o-none{background:#f1f3f8;color:#8a93a8}
 .gpoptsel{width:auto;min-width:128px;padding:6px 8px;border-radius:10px;font-size:13px}
+/* Sélection groupée (Gestion de projet) */
+.gpbulk{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin:-4px 0 14px;padding:10px 14px;border:1px dashed #c9d4ef;border-radius:12px;background:#f7f9ff}
+.gpbulk label{display:inline-flex;align-items:center;gap:8px;margin:0;cursor:pointer;color:#1f3380;font-size:13px}
+.gpbulk select{width:auto;min-width:190px;padding:8px 10px}.gpbulk .btn{margin:0}
+th.gpck,td.gpck{width:34px;text-align:center;padding-left:8px;padding-right:4px}
+.gpck input,.gpbulk input[type=checkbox]{width:18px;height:18px;margin:0;padding:0;box-shadow:none;accent-color:#d6245f;cursor:pointer}
+#gpRows tr.sel td{background:#fff0f5}
+@media print{.gpbulk,.gpck{display:none!important}}
 /* ===== Images COHAG ===== */
 .brand{padding:4px 0 22px;text-shadow:none}
 .brand .logo{display:block;background:#fff;border-radius:16px;padding:10px 12px;box-shadow:0 6px 0 #06133a,0 12px 22px #0008,inset 0 1px #fff}
@@ -928,7 +936,7 @@ function resetUI(text){
   document.querySelectorAll('.nav').forEach(b=>b.classList.add('hidden'));
   $('pageTitle').textContent='Connexion';$('userName').textContent='Accès sécurisé';$('userRole').textContent='';$('avatar').textContent='🔒';$('repart').innerHTML='';$('activ').innerHTML='';$('status').textContent='● Hors connexion';
   $('password').value='';if(text)msg('loginMessage',text);
-  GP.projets=[];GP.cur=null;GP.lignes=[];GP.pay={};GP.q='';GP.pq='';['gpCards','gpTabs','gpBody'].forEach(i=>$(i).innerHTML='');if($('gpDlg').open)$('gpDlg').close();
+  GP.projets=[];GP.cur=null;GP.lignes=[];GP.pay={};GP.sel.clear();GP.vis=[];GP.q='';GP.pq='';['gpCards','gpTabs','gpBody'].forEach(i=>$(i).innerHTML='');if($('gpDlg').open)$('gpDlg').close();
 }
 async function logout(text){if(client)await client.auth.signOut();resetUI(text)}
 $('logout').onclick=()=>logout('Vous êtes déconnecté.');
@@ -1002,7 +1010,9 @@ $('usrRows').onclick=async e=>{
    versement complet, attestations) avec calculs automatiques.
    Les agents n'agissent ici que selon leurs droits gp_ajouter / gp_modifier / gp_supprimer.
    ===================================================================== */
-const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',sort:'date',edit:null,projEdit:null,busy:false,of:'',newCols:true};
+const GP={projets:[],cur:null,lignes:[],pay:{},tab:'home',q:'',pq:'',sort:'date',edit:null,projEdit:null,busy:false,of:'',newCols:true,sel:new Set(),vis:[]};
+/* Sélection groupée : seuls les comptes ayant le droit « Modifier » la voient */
+const gpBulkOn=()=>can('gp_modifier')&&GP.newCols;
 /* Pages des années : tri par ordre d'arrivée (date la plus ancienne d'abord, personnes sans date à la fin) ou par N° */
 const gpSorted=k=>{const a=gpOf(k);if(k[0]!=='y'||GP.sort!=='date')return a;
   return a.slice().sort((x,y)=>(!x.date_arrivee)-(!y.date_arrivee)||String(x.date_arrivee||'').localeCompare(String(y.date_arrivee||''))||(x.numero??1e9)-(y.numero??1e9))};
@@ -1067,7 +1077,7 @@ $('gpProjForm').onsubmit=async e=>{
 };
 $('gpProjForm').addEventListener('reset',()=>{GP.projEdit=null;$('gpProjForm').closest('.panel').classList.toggle('hidden',!can('gp_ajouter'));$('gpProjSave').textContent='Ajouter le projet';$('gpPFTitle').textContent='Ajouter un projet';$('gpp_an').disabled=false;setTimeout(()=>{$('gpp_prix').value=50000;$('gpp_an').value=new Date().getFullYear()})});
 
-async function gpOpen(id){GP.cur=id;GP.tab='home';GP.q='';GP.pq='';show('gprojet');await gpLoad()}
+async function gpOpen(id){GP.cur=id;GP.sel.clear();GP.tab='home';GP.q='';GP.pq='';show('gprojet');await gpLoad()}
 async function gpLoad(){
   if(!user||!GP.cur)return;
   msg('gpLMsg','Chargement…');
@@ -1139,16 +1149,67 @@ function gpPage(k){
   $('gpBody').innerHTML=`<div class="panel"><div class="panelhead"><div><h3>${esc(gpLabel(k))}</h3><div class="muted">${s.c} personne${s.c>1?'s':''} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''} · Total ${money(s.t)}${k==='attestation'?' · Terrain = superficie × '+gpNf(gpP().prix_m2)+' F · Villa = terrain + construction · Appartement = prix fixe':''}</div></div>
 <div class="toolbar gpbar"><button class="btn primary" type="button" data-gpadd>＋ Ajouter une personne</button><button class="btn light" type="button" data-gpcsv="${k}">Exporter CSV</button><button class="btn light" type="button" data-gpprint>Imprimer</button>${k==='attestation'?'<button class="btn light" type="button" data-gpprix>💲 Prix du m²</button>':''}</div></div>
 <div class="searchrow gpbar"><input id="gpPq" type="search" maxlength="60" placeholder="Filtrer cette page (prénom, nom, téléphone)…" aria-label="Filtrer cette page" value="${esc(GP.pq)}"><select id="gpOf" aria-label="Filtrer par option"><option value="">Toutes les options</option>${GP_OPTS.map(o=>`<option${GP.of===o?' selected':''}>${o}</option>`).join('')}<option value="none"${GP.of==='none'?' selected':''}>Option non renseignée</option></select>${k[0]==='y'?`<select id="gpSort" aria-label="Ordre d’affichage"><option value="date"${GP.sort==='date'?' selected':''}>Ordre d’arrivée (date la plus ancienne d’abord)</option><option value="num"${GP.sort==='num'?' selected':''}>Ordre des numéros (N°)</option></select>`:''}</div>
-<div class="tablewrap"><table><thead><tr><th>N°</th><th>Prénoms</th><th>Noms</th><th>Téléphone</th><th>Option</th>${vers?'<th>N° parcelle</th><th class="num">Versement</th><th class="num">Superficie</th>':'<th>Date d’arrivée</th><th class="num">Acompte</th><th class="num">Nb</th>'}</tr></thead><tbody id="gpRows"></tbody>
-<tfoot><tr><td colspan="6">TOTAL ${k==='attestation'?'ATTESTATIONS':k==='versement'?'VERSEMENT COMPLET':'ACOMPTE'} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''}</td><td class="num">${money(s.t)}</td><td></td></tr></tfoot></table></div></div>`;
+${gpBulkOn()?`<div class="gpbulk gpbar"><label><input type="checkbox" data-gpall aria-label="Tout sélectionner"><b>Tout sélectionner</b></label><span id="gpSelN" class="muted" style="margin:0">Aucune personne sélectionnée</span><select id="gpBulkOpt" aria-label="Option à appliquer"><option value="">Option à appliquer…</option>${GP_OPTS.map(o=>`<option>${o}</option>`).join('')}<option value="none">Retirer l’option</option></select><button class="btn mini primary" type="button" data-gpbulk disabled>Appliquer aux sélectionnés</button><button class="btn mini light" type="button" data-gpselclear>Tout désélectionner</button></div>`:''}
+<div class="tablewrap"><table><thead><tr>${gpBulkOn()?'<th class="gpck"><input type="checkbox" data-gpall aria-label="Tout sélectionner"></th>':''}<th>N°</th><th>Prénoms</th><th>Noms</th><th>Téléphone</th><th>Option</th>${vers?'<th>N° parcelle</th><th class="num">Versement</th><th class="num">Superficie</th>':'<th>Date d’arrivée</th><th class="num">Acompte</th><th class="num">Nb</th>'}</tr></thead><tbody id="gpRows"></tbody>
+<tfoot><tr><td colspan="${gpBulkOn()?7:6}">TOTAL ${k==='attestation'?'ATTESTATIONS':k==='versement'?'VERSEMENT COMPLET':'ACOMPTE'} · ${s.n} ${k==='attestation'?'attestation':lab.toLowerCase()}${s.n>1?'s':''}</td><td class="num">${money(s.t)}</td><td></td></tr></tfoot></table></div></div>`;
   $('gpPq').oninput=e=>{GP.pq=e.target.value;gpRows(k)};$('gpOf').onchange=e=>{GP.of=e.target.value;gpRows(k)};if($('gpSort'))$('gpSort').onchange=e=>{GP.sort=e.target.value;gpRows(k)};gpRows(k);
 }
 function gpRows(k){
   const vers=k==='versement'||k==='attestation',q=gpNorm(GP.pq),qd=GP.pq.replace(/\D/g,'');
   const arr=gpSorted(k).filter(l=>!q||gpNorm(l.prenom+' '+l.nom).includes(q)||(qd.length>=3&&String(l.telephone||'').replace(/\D/g,'').includes(qd))).filter(l=>!GP.of||(GP.of==='none'?!l.option_acquisition:l.option_acquisition===GP.of));
   const ed=can('gp_modifier')&&GP.newCols,optCell=l=>ed?`<select class="gpoptsel" data-optl="${esc(l.id)}" aria-label="Option de ${esc(l.prenom)} ${esc(l.nom)}"><option value="">—</option>${GP_OPTS.map(o=>`<option${l.option_acquisition===o?' selected':''}>${o}</option>`).join('')}</select>`:gpOptTag(l.option_acquisition);
-  $('gpRows').innerHTML=arr.map(l=>{const m=gpMt(l),np=(GP.pay[l.id]||[]).length;return `<tr class="${gpBad(l)?'bad':''}"><td>${esc(l.numero??'')}</td><td><button class="lnk" type="button" data-ligne="${esc(l.id)}">${esc(l.prenom)||'—'}</button></td><td>${esc(l.nom)}</td><td>${esc(l.telephone||'')}</td><td>${optCell(l)}</td>${vers?`<td>${esc(l.n_parcelle||'')}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${l.superficie!=null?gpNf(l.superficie):''}</td>`:`<td class="dt">${esc(gpDate(l))}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${np>1?np:''}</td>`}</tr>`}).join('')||'<tr><td colspan="7" class="empty">Aucune personne sur cette page.</td></tr>';
+  const bo=gpBulkOn();GP.vis=arr.map(l=>String(l.id));
+  $('gpRows').innerHTML=arr.map(l=>{const m=gpMt(l),np=(GP.pay[l.id]||[]).length,rid=String(l.id),on=GP.sel.has(rid);return `<tr class="${gpBad(l)?'bad':''}${on?' sel':''}" data-rid="${esc(rid)}">${bo?`<td class="gpck"><input type="checkbox" data-gpsel="${esc(rid)}"${on?' checked':''} aria-label="Sélectionner ${esc(l.prenom)} ${esc(l.nom)}"></td>`:''}<td>${esc(l.numero??'')}</td><td><button class="lnk" type="button" data-ligne="${esc(l.id)}">${esc(l.prenom)||'—'}</button></td><td>${esc(l.nom)}</td><td>${esc(l.telephone||'')}</td><td>${optCell(l)}</td>${vers?`<td>${esc(l.n_parcelle||'')}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${l.superficie!=null?gpNf(l.superficie):''}</td>`:`<td class="dt">${esc(gpDate(l))}</td><td class="num">${m?gpNf(m):''}</td><td class="num">${np>1?np:''}</td>`}</tr>`}).join('')||`<tr><td colspan="${bo?9:8}" class="empty">Aucune personne sur cette page.</td></tr>`;
+  gpSelUpdate();
 }
+/* ---------- Sélection groupée : appliquer une option à plusieurs personnes ---------- */
+function gpSelUpdate(){
+  const n=GP.sel.size,vis=GP.vis||[],nv=vis.filter(id=>GP.sel.has(id)).length;
+  document.querySelectorAll('#gprojetView [data-gpall]').forEach(c=>{c.checked=vis.length>0&&nv===vis.length;c.indeterminate=nv>0&&nv<vis.length});
+  const s=$('gpSelN');if(s)s.textContent=n?n+' personne'+(n>1?'s':'')+' sélectionnée'+(n>1?'s':''):'Aucune personne sélectionnée';
+  const b=document.querySelector('#gprojetView [data-gpbulk]');if(b)b.disabled=GP.busy||!n||!$('gpBulkOpt').value;
+  document.querySelectorAll('#gpRows tr[data-rid]').forEach(tr=>tr.classList.toggle('sel',GP.sel.has(tr.dataset.rid)));
+}
+async function gpBulkApply(){
+  if(!user||GP.busy)return;
+  if(!can('gp_modifier')||!GP.newCols)return msg('gpLMsg',DENY,'error');
+  const raw=$('gpBulkOpt')?.value;if(!raw)return msg('gpLMsg','Choisissez d’abord l’option à appliquer.','error');
+  const v=raw==='none'?null:raw,lab=v||'non renseignée',page=GP.tab;
+  const sel=GP.lignes.filter(l=>GP.sel.has(String(l.id)));
+  if(!sel.length)return msg('gpLMsg','Sélectionnez au moins une personne.','error');
+  const todo=sel.filter(l=>(l.option_acquisition||null)!==v);
+  if(!todo.length){GP.sel.clear();gpRows(page);return msg('gpLMsg','Les '+sel.length+' personne'+(sel.length>1?'s':'')+' sélectionnée'+(sel.length>1?'s ont':' a')+' déjà l’option « '+lab+' ».','success')}
+  const rec={option_acquisition:v};
+  if(v!=='Villa'){rec.prix_terrain=null;rec.prix_construction=null}if(v!=='Appartement')rec.prix_fixe=null;
+  const lost=todo.filter(l=>(v!=='Villa'&&(l.prix_terrain!=null||l.prix_construction!=null))||(v!=='Appartement'&&l.prix_fixe!=null)).length;
+  if(!confirm('Appliquer l’option « '+lab+' » à '+todo.length+' personne'+(todo.length>1?'s':'')+' de la page « '+gpLabel(page)+' » ?'
+    +(sel.length>todo.length?'\n'+(sel.length-todo.length)+' autre(s) ont déjà cette option : elles ne changent pas.':'')
+    +(lost?'\n⚠️ '+lost+' personne(s) ont des prix Villa/Appartement déjà saisis : ces prix seront effacés.':'')
+    +(page==='attestation'&&v&&v!=='Terrain'?'\nAttestations : le montant passera à 0 tant que les prix ne sont pas saisis dans chaque fiche.':'')))return;
+  GP.busy=true;gpSelUpdate();
+  let ok=0,err=null;
+  try{
+    for(let i=0;i<todo.length;i+=100){
+      const part=todo.slice(i,i+100);msg('gpLMsg','Application en cours… '+ok+' / '+todo.length);
+      const {data,error}=await client.from('gp_lignes').update(rec).in('id',part.map(l=>l.id)).select('id');
+      if(error){err=error;break}
+      const done=new Set((data||[]).map(x=>String(x.id)));
+      part.forEach(l=>{if(done.has(String(l.id))){Object.assign(l,rec);ok++}});
+      if(done.size<part.length){err={code:'droits'};break}
+    }
+  }catch(e){err=e}
+  finally{GP.busy=false}
+  GP.sel.clear();if(GP.tab===page)gpPage(page);
+  if(err)return msg('gpLMsg',ok+' personne'+(ok>1?'s':'')+' modifiée'+(ok>1?'s':'')+' sur '+todo.length+'. '+gpErr(err,'La suite n’a pas pu être enregistrée : cliquez sur « Actualiser » puis recommencez.'),'error');
+  msg('gpLMsg','Option « '+lab+' » appliquée à '+ok+' personne'+(ok>1?'s':'')+' de la page « '+gpLabel(page)+' ».'+(page==='attestation'&&v&&v!=='Terrain'?' Ouvrez chaque fiche pour saisir les prix.':''),'success');
+}
+$('gprojetView').addEventListener('change',e=>{
+  const a=e.target.closest('[data-gpall]');
+  if(a){(GP.vis||[]).forEach(id=>a.checked?GP.sel.add(id):GP.sel.delete(id));document.querySelectorAll('#gpRows [data-gpsel]').forEach(c=>c.checked=GP.sel.has(c.dataset.gpsel));return gpSelUpdate()}
+  const c=e.target.closest('[data-gpsel]');
+  if(c){c.checked?GP.sel.add(c.dataset.gpsel):GP.sel.delete(c.dataset.gpsel);return gpSelUpdate()}
+  if(e.target.id==='gpBulkOpt')gpSelUpdate();
+});
 
 /* ---------- Fiche d'une personne + historique des acomptes ---------- */
 function gpPageOptions(sel){$('g_page').innerHTML=gpKeys().map(k=>`<option value="${k}">${esc(gpLabel(k))}</option>`).join('');$('g_page').value=sel}
@@ -1287,8 +1348,10 @@ $('gprojetView').addEventListener('change',async e=>{
 });
 $('gprojetView').addEventListener('click',async e=>{
   const t=e.target.closest('button,tr[data-tab]');if(!t||!user)return;
-  if(t.dataset.tab){if(t.dataset.tab!==GP.tab){GP.tab=t.dataset.tab;GP.pq='';msg('gpLMsg','');gpRender();window.scrollTo({top:0})}return}
+  if(t.dataset.tab){if(t.dataset.tab!==GP.tab){GP.tab=t.dataset.tab;GP.pq='';GP.sel.clear();msg('gpLMsg','');gpRender();window.scrollTo({top:0})}return}
   if(t.dataset.ligne)return gpFiche(t.dataset.ligne);
+  if('gpbulk' in t.dataset)return gpBulkApply();
+  if('gpselclear' in t.dataset){GP.sel.clear();document.querySelectorAll('#gpRows [data-gpsel]').forEach(c=>c.checked=false);return gpSelUpdate()}
   if('gpadd' in t.dataset)return can('gp_ajouter')?gpFiche(null):msg('gpLMsg',DENY,'error');
   if(t.dataset.gpcsv)return gpCsv(t.dataset.gpcsv);
   if('gpprint' in t.dataset)return window.print();
